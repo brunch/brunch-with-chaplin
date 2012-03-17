@@ -7,7 +7,8 @@ Requires Brunch 1.x.
 ## Features
 * CoffeeScript as script language
 * Handlebars as templating language
-* Stylus as style language
+* Stylus as stylesheet language
+* Backbone as main framework
 * Cross-module communication using the Mediator and Publish/Subscribe patterns
 * Controllers for managing individual UI views
 * Rails-style routes which map URLs to controller actions
