@@ -1,5 +1,5 @@
 mediator = require 'mediator'
-Model = require 'Model'
+Model = require 'models/model'
 
 module.exports = class Post extends Model
   # This model is intentionally left blank
