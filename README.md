@@ -5,9 +5,8 @@ that uses [Chaplin](https://github.com/moviepilot/chaplin) structure.
 Requires Brunch 1.x.
 
 ## Features
-* CoffeeScript as script language
-* Handlebars as templating language
-* Stylus as stylesheet language
+* HTML5Boilerplate 3.0 html & Bootstrap 2.0 css are included.
+* CoffeeScript + Stylus + Handlebars as app languages
 * Backbone as main framework
 * Cross-module communication using the Mediator and Publish/Subscribe patterns
 * Controllers for managing individual UI views
@@ -20,6 +19,7 @@ enforce conventions
 * A collection view for easy and intelligent list rendering
 * Client-side authentication using service providers like Facebook, Google
 and Twitter
+* Easy debugging: just uncomment `#console.debug` in all files.
 
 ## Getting started
 * Clone or download the project.
@@ -30,6 +30,9 @@ and Twitter
 
 See [Chaplin github page](https://github.com/moviepilot/chaplin) for
 documentation.
+
+## Other
+The template uses commit [4422a6908b537b27b48e2811af31334929ff882b](https://github.com/moviepilot/chaplin/commit/4422a6908b537b27b48e2811af31334929ff882b) of Chaplin with module definitions rewritten for brunch.
 
 ## License
 The MIT license.
