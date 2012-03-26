@@ -1,5 +1,5 @@
 # Brunch with Chaplin
-Brunch with Chaplin is an application template for [Brunch](http://brunch.io)
+Brunch with Chaplin is a skeleton for [Brunch](http://brunch.io)
 that uses [Chaplin](https://github.com/moviepilot/chaplin) structure.
 
 Requires Brunch 1.x.
@@ -22,17 +22,20 @@ and Twitter
 * Easy debugging: just uncomment `#console.debug` in all files.
 
 ## Getting started
+If you're using Brunch 1.0.x:
+
 * Clone or download the project.
 * Create new project via executing `brunch new --template <PATH TO THE PROJECT>`
-* Edit `app/lib/services/facebook.coffee` and change `facebookAppId` to your ID.
-* Note that if you'll use predefined `facebookAppId`, you'll need to use
+
+Edit `app/lib/services/facebook.coffee` and change `facebookAppId` to your ID. 
+Note that if you'll use predefined `facebookAppId`, you'll need to use
 `http://localhost` domain.
 
 See [Chaplin github page](https://github.com/moviepilot/chaplin) for
 documentation.
 
 ## Other
-The template uses commit [4422a6908b537b27b48e2811af31334929ff882b](https://github.com/moviepilot/chaplin/commit/4422a6908b537b27b48e2811af31334929ff882b) of Chaplin with module definitions rewritten for brunch.
+The template uses commit [4ef9c4e18d96d715f3dce24c4250772bbe992491](https://github.com/moviepilot/chaplin/commit/4ef9c4e18d96d715f3dce24c4250772bbe992491) of Chaplin with module definitions rewritten for brunch.
 
 ## License
 The MIT license.
