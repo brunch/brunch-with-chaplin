@@ -35,7 +35,7 @@ See [Chaplin github page](https://github.com/moviepilot/chaplin) for
 documentation.
 
 ## Other
-The template uses commit [4ef9c4e18d96d715f3dce24c4250772bbe992491](https://github.com/moviepilot/chaplin/commit/4ef9c4e18d96d715f3dce24c4250772bbe992491) of Chaplin with module definitions rewritten for brunch.
+The template uses commit [a21c7a937b4ce430e57805a530ae4634cebd53a0](https://github.com/moviepilot/chaplin/commit/a21c7a937b4ce430e57805a530ae4634cebd53a0) of Chaplin with module definitions rewritten for brunch.
 
 ## License
 The MIT license.

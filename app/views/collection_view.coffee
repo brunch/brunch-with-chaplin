@@ -143,18 +143,10 @@ module.exports = class CollectionView extends View
 
   # Render and insert all items
   # Accepts the options `shuffle` (Boolean) and `limit` (Number)
-  renderAllItems: (options = {}) =>
+  renderAllItems: =>
 
     items = @collection.models
     #console.debug 'CollectionView#renderAllItems', items.length
-
-    # Shuffle
-    if options.shuffle
-      items = MovieExplorer.utils.shuffle @collection.models
-
-    # Apply limit
-    if options.limit
-      items = items.slice(0, options.limit)
 
     # Reset visible items
     @visibleItems = []

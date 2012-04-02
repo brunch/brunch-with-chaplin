@@ -194,7 +194,7 @@ not found on #{controllerName} controller"
 
     else
       throw new Error "ApplicationView#adjustURL: controller for
-#{controllerName} does not provide a historyURL"
+#{@currentControllerName} does not provide a historyURL"
 
     # Pass to the router to actually change the current URL
     # (call history.pushState)
