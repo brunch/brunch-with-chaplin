@@ -30,10 +30,9 @@ exports.config =
       joinTo: 'stylesheets/app.css'
       order:
         before: [
-          'vendor/styles/bootstrap.css',
-          'vendor/styles/bootstrap-responsive.css'
+          'vendor/styles/normalize.css'
         ]
-        after: []
+        after: ['vendor/styles/helpers.css']
 
     templates:
       defaultExtension: 'eco'
