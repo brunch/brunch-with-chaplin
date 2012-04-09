@@ -47,7 +47,8 @@ Versions of software the skeleton uses:
 The MIT license.
 
 Copyright (c) Paul Miller (http://paulmillr.com/)
-Copyright (C) 2012 Moviepilot GmbH, 9elements GmbH et al.
+
+Copyright (c) 2012 Moviepilot GmbH, 9elements GmbH et al.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
