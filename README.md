@@ -5,7 +5,7 @@ that uses [Chaplin](https://github.com/moviepilot/chaplin) structure.
 Requires Brunch 1.x.
 
 ## Features
-* HTML5Boilerplate 3.0 html & Bootstrap 2.0 css are included.
+* HTML5Boilerplate 3.0 html & css are included.
 * CoffeeScript + Stylus + Handlebars as app languages
 * Backbone as main framework
 * Cross-module communication using the Mediator and Publish/Subscribe patterns
