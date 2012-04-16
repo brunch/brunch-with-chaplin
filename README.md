@@ -1,8 +1,17 @@
 # Brunch with Chaplin
-Brunch with Chaplin is a fork of [Chaplin](https://github.com/moviepilot/chaplin) that's bundled to one file
-with [Brunch](http://brunch.io).
+Brunch with Chaplin is a fork of [Chaplin](https://github.com/moviepilot/chaplin) that is bundled to one file for usage with [Brunch](http://brunch.io).
 
 Requires Brunch 1.1+.
+
+## Getting started
+Just copy `public/chaplin.js` to your `vendor/scripts` directory.
+
+To use Chaplin classes, you'll need to do `require 'chaplin/CLASS_NAME'`, e.g., `ChaplinView = require 'chaplin/views/view'`.
+
+Example application built with the lib: [Tweet your brunch](https://github.com/brunch/twitter).
+
+See [Chaplin github page](https://github.com/moviepilot/chaplin) for
+documentation.
 
 ## Features
 * Cross-module communication using the Mediator and Publish/Subscribe patterns
@@ -17,16 +26,6 @@ enforce conventions
 * Client-side authentication using service providers like Facebook, Google
 and Twitter
 * Easy debugging: just uncomment `#console.debug` in all files.
-
-## Getting started
-Just copy `public/chaplin.js` to your `vendor/scripts` directory.
-
-To use Chaplin classes, you'll need to do `require 'chaplin/CLASS_NAME'`.
-
-For example, `ChaplinView = require 'chaplin/views/view'`.
-
-See [Chaplin github page](https://github.com/moviepilot/chaplin) for
-documentation.
 
 ## Other
 Versions of software the skeleton uses:
