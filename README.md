@@ -1,13 +1,10 @@
 # Brunch with Chaplin
-Brunch with Chaplin is a skeleton for [Brunch](http://brunch.io)
-that uses [Chaplin](https://github.com/moviepilot/chaplin) structure.
+Brunch with Chaplin is a fork of [Chaplin](https://github.com/moviepilot/chaplin) that's bundled to one file
+with [Brunch](http://brunch.io).
 
-Requires Brunch 1.x.
+Requires Brunch 1.1+.
 
 ## Features
-* HTML5Boilerplate 3.0 html & css are included.
-* CoffeeScript + Stylus + Handlebars as app languages
-* Backbone as main framework
 * Cross-module communication using the Mediator and Publish/Subscribe patterns
 * Controllers for managing individual UI views
 * Rails-style routes which map URLs to controller actions
@@ -22,14 +19,11 @@ and Twitter
 * Easy debugging: just uncomment `#console.debug` in all files.
 
 ## Getting started
-If you're using Brunch 1.0.x:
+Just copy `public/chaplin.js` to your `vendor/scripts` directory.
 
-* Clone or download the project.
-* Create new project via executing `brunch new --template <PATH TO THE PROJECT>`
+To use Chaplin classes, you'll need to do `require 'chaplin/CLASS_NAME'`.
 
-Edit `app/lib/services/facebook.coffee` and change `facebookAppId` to your ID. 
-Note that if you'll use predefined `facebookAppId`, you'll need to use
-`http://localhost` domain.
+For example, `ChaplinView = require 'chaplin/views/view'`.
 
 See [Chaplin github page](https://github.com/moviepilot/chaplin) for
 documentation.
@@ -37,11 +31,7 @@ documentation.
 ## Other
 Versions of software the skeleton uses:
 
-* Chaplin [a21c7a937b4ce430e57805a530ae4634cebd53a0](https://github.com/moviepilot/chaplin/commit/a21c7a937b4ce430e57805a530ae4634cebd53a0)
-* jQuery 1.7.2
-* Backbone 0.9.1
-* Underscore 1.3.1
-* HTML5Boilerplate 3.0.3
+* Chaplin [610a5cc58925a6bd2dd69d5542bd094a0dc74198](https://github.com/moviepilot/chaplin/commit/610a5cc58925a6bd2dd69d5542bd094a0dc74198)
 
 ## License
 The MIT license.
