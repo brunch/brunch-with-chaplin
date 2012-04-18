@@ -32,10 +32,10 @@ module.exports = class Application
   # ----------------------
 
   # Pass the function typically returned by routes.coffee
-  initRouter: (routes) ->
+  initRouter: (routes, options) ->
     # Save the reference for testing introspection only.
     # Module should communicate with each other via Pub/Sub.
-    @router = new Router()
+    @router = new Router(options)
 
     # Register all routes declared in routes.coffee
     routes? @router.match

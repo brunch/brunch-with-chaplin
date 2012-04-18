@@ -10,7 +10,7 @@ module.exports = class Router # This class does not extend Backbone.Router
 
   _(Router.prototype).extend Subscriber
 
-  constructor: ->
+  constructor: (@options = {}) ->
     @subscribeEvent '!router:route', @routeHandler
     @subscribeEvent '!router:changeURL', @changeURLHandler
 
@@ -21,9 +21,10 @@ module.exports = class Router # This class does not extend Backbone.Router
     Backbone.history or= new Backbone.History()
 
   startHistory: ->
+    pushState = @options.pushState ? true
     # Start the Backbone.History instance to start routing
     # This should be called after all routes have been registered
-    Backbone.history.start pushState: true
+    Backbone.history.start {pushState}
 
   # Stop the current Backbone.History instance from observing URL changes
   stopHistory: ->
