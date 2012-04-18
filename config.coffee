@@ -4,4 +4,5 @@ exports.config =
 
   files:
     javascripts:
-      joinTo: 'chaplin.js'
+      joinTo:
+        'chaplin.js': /^app\//
