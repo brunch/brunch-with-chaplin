@@ -4,9 +4,11 @@ Brunch with Chaplin is a fork of [Chaplin](https://github.com/moviepilot/chaplin
 Requires Brunch 1.1+.
 
 ## Getting started
-Just copy `public/chaplin.js` to your `vendor/scripts` directory.
-
-To use Chaplin classes, you'll need to do `require 'chaplin/CLASS_NAME'`, e.g., `ChaplinView = require 'chaplin/views/view'`.
+* Create new project via executing `brunch new --skeleton git://github.com/paulmillr/brunch-with-chaplin.git`
+* Build the project with `brunch b` or `brunch w`.
+* Open the `public/` dir to see the result.
+* Remove `home` view, controller, template & style via `brunch d scaffold home`.
+* Write your code.
 
 Example application built with the lib: [Tweet your brunch](https://github.com/brunch/twitter).
 
@@ -14,6 +16,9 @@ See [Chaplin github page](https://github.com/moviepilot/chaplin) for
 documentation.
 
 ## Features
+* HTML5Boilerplate 3.0 html & css are included.
+* CoffeeScript + Stylus + Handlebars as app languages
+* Backbone as main framework
 * Cross-module communication using the Mediator and Publish/Subscribe patterns
 * Controllers for managing individual UI views
 * Rails-style routes which map URLs to controller actions
@@ -30,7 +35,7 @@ and Twitter
 ## Other
 Versions of software the skeleton uses:
 
-* Chaplin [610a5cc58925a6bd2dd69d5542bd094a0dc74198](https://github.com/moviepilot/chaplin/commit/610a5cc58925a6bd2dd69d5542bd094a0dc74198)
+* Chaplin [5ac3fa3f45eaef376f856224348e812b80c583e5](https://github.com/moviepilot/chaplin/commit/5ac3fa3f45eaef376f856224348e812b80c583e5)
 
 ## License
 The MIT license.

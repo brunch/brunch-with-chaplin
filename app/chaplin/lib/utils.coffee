@@ -34,12 +34,14 @@ module.exports = utils =
     str.charAt(0).toUpperCase() + str.substring(1)
 
   # underScoreHelper -> under_score_helper
-  underscorize: do ->
-    regexp = /[A-Z]/g
-    underscorizer = (c) ->
-      '_' + c.toLowerCase()
-    (string) ->
-      string.replace regexp, underscorizer
+  underscorize: (string) ->
+    string.replace /[A-Z]/g, (char, index) ->
+      (if index isnt 0 then '_' else '') + char.toLowerCase()
+
+  # dashHelper -> dash-helper
+  dasherize: (string) ->
+    string.replace /[A-Z]/g, (char, index) ->
+      (if index isnt 0 then '-' else '') + char.toLowerCase()
 
   # Persistent data storage
   # -----------------------
