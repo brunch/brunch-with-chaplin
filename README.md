@@ -35,6 +35,10 @@ and Twitter
 ## Other
 Versions of software the skeleton uses:
 
+* HTML5Boilerplate 3.0.3
+* jQuery 1.7.2
+* Backbone 0.9.2
+* Underscore 1.3.3
 * Chaplin [5ac3fa3f45eaef376f856224348e812b80c583e5](https://github.com/moviepilot/chaplin/commit/5ac3fa3f45eaef376f856224348e812b80c583e5)
 
 ## License
