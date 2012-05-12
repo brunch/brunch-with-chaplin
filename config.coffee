@@ -24,3 +24,5 @@ exports.config =
     templates:
       defaultExtension: 'hbs'
       joinTo: 'javascripts/app.js'
+
+  framework: 'chaplin'
