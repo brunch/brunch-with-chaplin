@@ -5,7 +5,7 @@ Subscriber = require 'chaplin/lib/subscriber'
 module.exports = class ApplicationController # Do not inherit from Controller
 
   # Mixin a Subscriber
-  _(ApplicationController.prototype).extend Subscriber
+  _(@prototype).extend Subscriber
 
   # The previous controller name
   previousControllerName: null
@@ -23,7 +23,7 @@ module.exports = class ApplicationController # Do not inherit from Controller
     @initialize()
 
   initialize: ->
-    #console.debug 'ApplicationController#initialize'
+    ###console.debug 'ApplicationController#initialize'###
 
     # Listen to global events
     @subscribeEvent 'matchRoute', @matchRoute
@@ -35,7 +35,6 @@ module.exports = class ApplicationController # Do not inherit from Controller
 
   # Handler for the global matchRoute event
   matchRoute: (route, params) ->
-    #console.debug 'ApplicationController#matchRoute'
     @startupController route.controller, route.action, params
 
   # Handler for the global !startupController event
@@ -49,7 +48,7 @@ module.exports = class ApplicationController # Do not inherit from Controller
   #   4. Show the new view
   #
   startupController: (controllerName, action = 'index', params = {}) ->
-    #console.debug 'ApplicationController#startupController', controllerName, action, params
+    ###console.debug 'ApplicationController#startupController', controllerName, action, params###
 
     # Set default flags
 
@@ -77,8 +76,8 @@ module.exports = class ApplicationController # Do not inherit from Controller
 
     # Fetch the new controller, then go on
     controllerFileName = utils.underscorize(controllerName) + '_controller'
-    controller = require "controllers/#{controllerFileName}"
-    @controllerLoaded controllerName, action, params, controller
+    handler = _(@controllerLoaded).bind(this, controllerName, action, params)
+    handler require 'controllers/' + controllerFileName
 
   # Handler for the controller lazy-loading
   controllerLoaded: (controllerName, action, params, ControllerConstructor) ->
@@ -95,11 +94,8 @@ module.exports = class ApplicationController # Do not inherit from Controller
       currentController.dispose params, controllerName
 
     # Initialize the new controller
-    controller = new ControllerConstructor()
-
-    # Call the initialize method
     # Passing the params and the old controller name
-    controller.initialize params, currentControllerName
+    controller = new ControllerConstructor params, currentControllerName
 
     # Call the specific controller action
     # Passing the params and the old controller name
@@ -115,7 +111,6 @@ module.exports = class ApplicationController # Do not inherit from Controller
     @adjustURL controller, params
 
     # We're done! Spread the word!
-    #console.debug 'publish startupController'
     mediator.publish 'startupController',
       previousControllerName: @previousControllerName
       controller: @currentController
@@ -154,6 +149,7 @@ module.exports = class ApplicationController # Do not inherit from Controller
   disposed: false
 
   dispose: ->
+    ###console.debug 'ApplicationController#dispose###
     return if @disposed
 
     @unsubscribeAllEvents()

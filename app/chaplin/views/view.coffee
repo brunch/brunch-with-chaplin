@@ -1,11 +1,11 @@
 utils = require 'chaplin/lib/utils'
 Subscriber = require 'chaplin/lib/subscriber'
-require 'chaplin/lib/view_helper'
+require 'lib/view_helper'
 
 module.exports = class View extends Backbone.View
 
   # Mixin a Subscriber
-  _(View.prototype).extend Subscriber
+  _(@prototype).extend Subscriber
 
   # Automatic rendering
   # -------------------
@@ -38,26 +38,22 @@ module.exports = class View extends Backbone.View
   # Wrap a `method` in order to call and `afterMethod`
   wrapMethod = (obj, name) ->
     func = obj[name]
-    #console.debug 'View wrapMethod', obj, name
     # Create a method on the instance which wraps the inherited
     obj[name] = ->
-      #console.debug 'View#' + name + ' wrapper', obj
       # Call the original method
       func.apply obj, arguments
       # Call the corresponding `after-` method
       obj["after#{utils.upcase(name)}"].apply obj, arguments
 
   constructor: ->
-    #console.debug 'View#constructor', this
-
     # Wrap `initialize` so `afterInitialize` is called afterwards
     # Only wrap if there is an overring method, otherwise we
     # call the after method directly
-    unless @initialize is View.prototype.initialize
+    unless @initialize is View::initialize
       wrapMethod this, 'initialize'
 
     # Wrap `render` so `afterRender` is called afterwards
-    unless @initialize is View.prototype.initialize
+    unless @initialize is View::initialize
       wrapMethod this, 'render'
     else
       # Otherwise just bind the `render` method normally
@@ -67,7 +63,7 @@ module.exports = class View extends Backbone.View
     super
 
   initialize: (options) ->
-    #console.debug 'View#initialize', this, 'options', options
+    ###console.debug 'View#initialize', this, 'options', options###
     # No super call here, Backbone’s `initialize` is a no-op
 
     # Initialize subviews
@@ -79,15 +75,12 @@ module.exports = class View extends Backbone.View
     if @model or @collection
       @modelBind 'dispose', @dispose
 
-    # Call afterInitialize manually when initialize wasn’t wrapped
-    if @initialize is View.prototype.initialize
-      #console.debug '\tcall afterInitialize without wrapping'
+    # Call afterInitialize manually if initialize did not wrap it
+    if @initialize is View::initialize
       @afterInitialize()
 
   # This method is called after a specific `initialize` of a derived class
   afterInitialize: ->
-    #console.debug 'View#afterInitialize', this
-
     # Render automatically if set by options or instance property
     # `autoRender` option may override `autoRender` instance property
     autoRender = if @options.autoRender?
@@ -98,12 +91,6 @@ module.exports = class View extends Backbone.View
 
   # User input event handling
   # -------------------------
-
-  # Make delegateEvents defunct, it is not used in our approach
-  # but is called by Backbone internally. Please use `delegate` and
-  # `undelegate` (see below) instead of the `events` hash.
-  delegateEvents: ->
-    # Noop
 
   # Event handling using event delegation
   # Register a handler for a specific event type
@@ -172,10 +159,10 @@ module.exports = class View extends Backbone.View
       throw new TypeError 'View#modelBind: no model or collection set'
 
     # Ensure that a handler isn’t registered twice
-    model.off type, handler, @
+    model.off type, handler, this
 
     # Register model handler, force context to the view
-    model.on type, handler, @
+    model.on type, handler, this
 
   # Unbind from a model event
 
@@ -201,7 +188,7 @@ module.exports = class View extends Backbone.View
     return unless model
 
     # Remove all handlers with a context of this view
-    model.off null, null, @
+    model.off null, null, this
 
   # Setup a simple one-way model-view binding
   # Pass changed attribute values to specific elements in the view
@@ -221,34 +208,33 @@ module.exports = class View extends Backbone.View
 
   # Getting or adding a subview
   subview: (name, view) ->
-    #console.debug 'View#subview', name, view
     if name and view
+      # Add the subview, ensure it’s unique
       @removeSubview name
       @subviews.push view
       @subviewsByName[name] = view
-      #console.debug '\tadd', name, view
       view
     else if name
-      #console.debug '\tget', name
+      # Get and return the subview by the given name
       @subviewsByName[name]
 
   # Removing a subview
   removeSubview: (nameOrView) ->
-    #console.debug 'View#removeSubview nameOrView:', nameOrView
     return unless nameOrView
 
     if typeof nameOrView is 'string'
+      # Name given, search for a subview by name
       name = nameOrView
       view = @subviewsByName[name]
     else
+      # View instance given, search for the corresponding name
       view = nameOrView
-      # Search for the name of the view
       for otherName, otherView of @subviewsByName
         if view is otherView
           name = otherName
           break
-
-    #console.debug 'View#removeSubview found name:', name, 'view:', view
+      
+    # Brak if no view and name were found
     return unless name and view and view.dispose
 
     # Dispose the view
@@ -281,54 +267,40 @@ module.exports = class View extends Backbone.View
 
     templateData
 
+  getTemplateFunction: ->
+    # Chaplin doesn’t define how you load and compile templates in order to
+    # render views. The example application uses Handlebars and RequireJS
+    # to load and compile templates on the client side. See the derived
+    # View class in the example application.
+    throw new Error 'View#getTemplateFunction must be overridden'
+
   # Main render function
-  # Always bind it to the view instance
+  # This method is bound to the instance in the constructor (see above)
   render: ->
-    #console.debug "View#render\n\t", this, "\n\tel:", @el, "\n\tmodel/collection:", (@model or @collection), "\n\tdisposed:", @disposed
+    ###console.debug 'View#render', this###
 
     return if @disposed
+    templateData = @getTemplateData()
+    templateFunc = @getTemplateFunction()
 
-    # Template compilation
-    # --------------------
-
-    # In the end, you might want to precompile the templates to JavaScript
-    # functions on the server-side and just load the JavaScript code.
-    # Several precompilers create a global JST hash which stores the
-    # template functions. You can get the function by the template name:
-    #
-    # templateFunc = JST[@template]
-    #
-    # In this demo, we load the template as a string, compile it
-    # on the client-side and store it on the view constructor as a
-    # static property.
-
-    template = @template
-
-    if typeof template is 'string'
-      template = Handlebars.compile template
-      # Save compiled template
-      @template = template
-
-    if typeof template is 'function'
+    if typeof templateFunc is 'function'
 
       # Call the template function passing the template data
-      html = template @getTemplateData()
+      html = templateFunc templateData
 
       # Replace HTML
       # ------------
 
       # This is a workaround for an apparent issue with jQuery 1.7’s
       # innerShiv feature. Using @$el.html(html) caused issues with
-      # HTML5-only tags in IE7 and IE8
+      # HTML5-only tags in IE7 and IE8.
       @$el.empty().append html
 
-    # Return this
+    # Return the view
     this
 
   # This method is called after a specific `render` of a derived class
   afterRender: ->
-    #console.debug 'View#afterRender', this
-
     # Create a shortcut to the container element
     # The view will be automatically appended to the container when rendered
     # `container` option may override `autoRender` instance property
@@ -345,7 +317,7 @@ module.exports = class View extends Backbone.View
         else
           @containerMethod
 
-      #console.debug '\tappend to DOM', containerMethod, container
+      # Append the view to the DOM
       $(container)[containerMethod] @el
 
       # Trigger an event
@@ -359,9 +331,9 @@ module.exports = class View extends Backbone.View
 
   disposed: false
 
-  dispose: =>
+  dispose: ->
+    ###console.debug 'View#dispose', this, 'disposed?', @disposed###
     return if @disposed
-    #console.debug 'View#dispose', this
 
     # Dispose subviews
     view.dispose() for view in @subviews
@@ -372,23 +344,24 @@ module.exports = class View extends Backbone.View
     # Unbind all model handlers
     @modelUnbindAll()
 
-    # Remove all event handlers
+    # Remove all event handlers on this module
     @off()
 
     # Remove the topmost element from DOM. This also removes all event
     # handlers from the element and all its children.
     @$el.remove()
 
-    # Remove element references, options and model/collection references
+    # Remove element references, options,
+    # model/collection references and subview lists
     properties = [
       'el', '$el',
       'options', 'model', 'collection',
-      'subviews', 'subviewsByName'
+      'subviews', 'subviewsByName',
+      '_callbacks'
     ]
     delete this[prop] for prop in properties
 
     # Finished
-    #console.debug 'View#dispose', this, 'finished'
     @disposed = true
 
     # Your're frozen when your heart’s not open

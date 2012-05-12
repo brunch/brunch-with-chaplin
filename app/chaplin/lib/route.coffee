@@ -10,7 +10,7 @@ module.exports = class Route
   queryStringValueSeparator = '='
 
   constructor: (pattern, target, @options = {}) ->
-    #console.debug 'Route#constructor', pattern, target, options
+    ###console.debug 'Route#constructor', pattern, target, options###
 
     # Save the raw pattern
     @pattern = pattern
@@ -21,8 +21,6 @@ module.exports = class Route
     @createRegExp()
 
   createRegExp: ->
-    #console.debug 'Route#createRegExp', @pattern
-
     if _.isRegExp(@pattern)
       @regExp = @pattern
       return
@@ -38,8 +36,6 @@ module.exports = class Route
     @regExp = ///^#{pattern}(?=\?|$)///
 
   addParamName: (match, paramName) =>
-    #console.debug 'Route#addParamName', match, paramName
-
     @paramNames ?= []
     # Test if parameter name is reserved
     if _(reservedParams).include(paramName)
@@ -51,7 +47,7 @@ module.exports = class Route
 
   # Test if the route matches to a path (called by Backbone.History#loadUrl)
   test: (path) ->
-    #console.debug 'Route#test', this, "path »#{path}«", typeof path
+    ###console.debug 'Route#test', this, "path »#{path}«", typeof path###
 
     # Test the main RegExp
     matched = @regExp.test path
@@ -70,7 +66,7 @@ module.exports = class Route
   # The handler which is called by Backbone.History when the route matched.
   # It is also called by Router#follow which might pass options
   handler: (path, options) =>
-    #console.debug 'Route#handler', this, path, options
+    ###console.debug 'Route#handler', this, path, options###
 
     # Build params hash
     params = @buildParams path, options
@@ -81,8 +77,6 @@ module.exports = class Route
   # Create a proper Rails-like params hash, not an array like Backbone
   # `matches` and `additionalParams` arguments are optional
   buildParams: (path, options) ->
-    #console.debug 'Route#buildParams', path, options
-
     params = {}
 
     # Add params from query string

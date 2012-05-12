@@ -2,7 +2,6 @@ mediator = require 'mediator'
 ApplicationController = require 'chaplin/controllers/application_controller'
 ApplicationView = require 'chaplin/views/application_view'
 Router = require 'chaplin/lib/router'
-require 'lib/view_helper'
 
 # The application bootstrapper
 # ----------------------------
@@ -18,7 +17,7 @@ module.exports = class Application
   router: null
 
   initialize: ->
-    #console.debug 'Application#initialize'
+    ###console.debug 'Application#initialize'###
 
     # Instantiate the AppController and AppView
     # -----------------------------------------
@@ -34,8 +33,8 @@ module.exports = class Application
   # Pass the function typically returned by routes.coffee
   initRouter: (routes, options) ->
     # Save the reference for testing introspection only.
-    # Module should communicate with each other via Pub/Sub.
-    @router = new Router(options)
+    # Modules should communicate with each other via Pub/Sub.
+    @router = new Router options
 
     # Register all routes declared in routes.coffee
     routes? @router.match
@@ -49,6 +48,7 @@ module.exports = class Application
   disposed: false
 
   dispose: ->
+    ###console.debug 'Application#dispose'###
     return if @disposed
 
     properties = ['applicationController', 'applicationView', 'router']

@@ -1,5 +1,5 @@
-template = require './templates/home'
-View = require './view'
+template = require 'views/templates/home'
+View = require 'views/view'
 
 module.exports = class HomeView extends View
   template: template

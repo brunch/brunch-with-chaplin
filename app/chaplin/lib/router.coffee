@@ -2,15 +2,21 @@ mediator = require 'mediator'
 Subscriber = require 'chaplin/lib/subscriber'
 Route = require 'chaplin/lib/route'
 
+
 # The router which is a replacement for Backbone.Router.
 # Like the standard router, it creates a Backbone.History
 # instance and registers routes on it.
 
 module.exports = class Router # This class does not extend Backbone.Router
 
-  _(Router.prototype).extend Subscriber
+  _(@prototype).extend Subscriber
 
   constructor: (@options = {}) ->
+    ###console.debug 'Router#constructor'###
+
+    _(@options).defaults
+      pushState: true
+
     @subscribeEvent '!router:route', @routeHandler
     @subscribeEvent '!router:changeURL', @changeURLHandler
 
@@ -21,10 +27,9 @@ module.exports = class Router # This class does not extend Backbone.Router
     Backbone.history or= new Backbone.History()
 
   startHistory: ->
-    pushState = @options.pushState ? true
     # Start the Backbone.History instance to start routing
     # This should be called after all routes have been registered
-    Backbone.history.start {pushState}
+    Backbone.history.start @options
 
   # Stop the current Backbone.History instance from observing URL changes
   stopHistory: ->
@@ -45,7 +50,7 @@ module.exports = class Router # This class does not extend Backbone.Router
   # accepts an absolute URL with a leading slash (e.g. /foo)
   # and passes a changeURL param to the callback function.
   route: (path) =>
-    #console.debug 'Router#route', path
+    ###console.debug 'Router#route', path###
 
     # Remove leading hash or slash
     path = path.replace /^(\/#|\/)/, ''
@@ -65,7 +70,7 @@ module.exports = class Router # This class does not extend Backbone.Router
   # Do not trigger any routes (which is Backbone’s
   # default behavior, but added for clarity)
   changeURL: (url) ->
-    #console.debug 'Router#changeURL', url
+    ###console.debug 'Router#changeURL', url###
     Backbone.history.navigate url, trigger: false
 
   # Handler for the global !router:changeURL event
@@ -78,12 +83,16 @@ module.exports = class Router # This class does not extend Backbone.Router
   disposed: false
 
   dispose: ->
+    ###console.debug 'Router#dispose'###
     return if @disposed
 
+    # Stop Backbone.History instance and remove it
     @stopHistory()
     delete Backbone.history
+
     @unsubscribeAllEvents()
 
+    # Finished
     @disposed = true
 
     # Your're frozen when your heart’s not open

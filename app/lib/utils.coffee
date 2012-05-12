@@ -5,7 +5,9 @@ chaplinUtils = require 'chaplin/lib/utils'
 # ------------------------------
 
 # Delegate to Chaplin’s utils module
-module.exports = utils = chaplinUtils.beget chaplinUtils
+utils = chaplinUtils.beget chaplinUtils
 
 #_(utils).extend
   # someMethod: ->
+
+module.exports = utils

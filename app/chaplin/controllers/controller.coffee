@@ -3,7 +3,7 @@ Subscriber = require 'chaplin/lib/subscriber'
 module.exports = class Controller
 
   # Mixin a Subscriber
-  _(Controller.prototype).extend Subscriber
+  _(@prototype).extend Subscriber
 
   view: null
   currentId: null
@@ -15,7 +15,7 @@ module.exports = class Controller
   # historyURL: ->
 
   constructor: ->
-    @initialize()
+    @initialize arguments...
 
   initialize: ->
 
@@ -24,9 +24,9 @@ module.exports = class Controller
 
   disposed: false
 
-  dispose: =>
+  dispose: ->
+    ###console.debug 'Controller#dispose', this, 'disposed?', @disposed###
     return if @disposed
-    #console.debug 'Controller#dispose', this
 
     # Dispose and delete all members which are disposable
     for own prop of this
@@ -43,7 +43,6 @@ module.exports = class Controller
     delete this[prop] for prop in properties
 
     # Finished
-    #console.debug 'Controller#dispose', this, 'finished'
     @disposed = true
 
     # You're frozen when your heart’s not open

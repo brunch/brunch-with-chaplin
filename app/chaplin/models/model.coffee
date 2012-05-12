@@ -3,7 +3,7 @@ Subscriber = require 'chaplin/lib/subscriber'
 module.exports = class Model extends Backbone.Model
 
   # Mixin a Subscriber
-  _(Model.prototype).extend Subscriber
+  _(@prototype).extend Subscriber
 
   # Creates a new deferred and mixes it into the model
   # This method can be called multiple times to reset the
@@ -23,8 +23,8 @@ module.exports = class Model extends Backbone.Model
   disposed: false
 
   dispose: ->
+    ###console.debug 'Model#dispose', this, 'disposed?', @disposed###
     return if @disposed
-    #console.debug 'Model#dispose', this
 
     # Fire an event to notify associated collections and views
     @trigger 'dispose', this
@@ -32,18 +32,23 @@ module.exports = class Model extends Backbone.Model
     # Unbind all global event handlers
     @unsubscribeAllEvents()
 
-    # Remove all event handlers
+    # Remove all event handlers on this module
     @off()
+
+    # If the model is a Deferred, reject it
+    # This does nothing if it was resolved before
+    @reject?()
 
     # Remove the collection reference and attributes
     properties = [
-      'collection', 'attributes', '_escapedAttributes', '_previousAttributes',
-      '_silent', '_pending'
+      'collection',
+      'attributes', '_escapedAttributes', '_previousAttributes',
+      '_silent', '_pending',
+      '_callbacks'
     ]
     delete this[prop] for prop in properties
 
     # Finished
-    #console.debug 'Model#dispose', this, 'finished'
     @disposed = true
 
     # Your're frozen when your heart’s not open

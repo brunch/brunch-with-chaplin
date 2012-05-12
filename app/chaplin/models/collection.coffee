@@ -1,12 +1,16 @@
 Subscriber = require 'chaplin/lib/subscriber'
 SyncMachine = require 'chaplin/lib/sync_machine'
+Model = require 'chaplin/models/model'
 
 # Abstract class which extends the standard Backbone collection
 # in order to add some functionality
 module.exports = class Collection extends Backbone.Collection
 
   # Mixin a Subscriber
-  _(Collection.prototype).extend Subscriber
+  _(@prototype).extend Subscriber
+
+  # Use the Chaplin model per default, not Backbone.Model
+  model: Model
 
   # Creates a new deferred and mixes it into the collection
   # This method can be called multiple times to reset the
@@ -35,12 +39,9 @@ module.exports = class Collection extends Backbone.Collection
   #   deep: Boolean flag to specify whether existing models should be updated
   #         with new values
   update: (newList, options = {}) ->
-    #console.debug 'Collection#update', 'deep?', options.deep
-
     fingerPrint = @pluck('id').join()
     ids = _(newList).pluck('id')
     newFingerPrint = ids.join()
-    #console.debug '\t' + fingerPrint + '\n\t' + newFingerPrint + '\n\t' + (fingerPrint is newFingerPrint)
 
     # Only execute removal if ID fingerprints differ
     unless fingerPrint is newFingerPrint
@@ -51,7 +52,6 @@ module.exports = class Collection extends Backbone.Collection
       while i >= 0
         model = @models[i]
         unless _ids.include model.id
-          #console.debug '\tremove', model.id
           @remove model
         i--
 
@@ -63,10 +63,10 @@ module.exports = class Collection extends Backbone.Collection
         preexistent = @get model.id
         if preexistent
           continue unless options.deep
-          #console.debug '\update', preexistent.id
+          # Update existing model
           preexistent.set model
         else
-          #console.debug '\tinsert', model.id, 'at', i
+          # Insert new model
           @add model, at: i
 
   # Disposal
@@ -75,30 +75,35 @@ module.exports = class Collection extends Backbone.Collection
   disposed: false
 
   dispose: ->
+    ###console.debug 'Collection#dispose', this, 'disposed?', @disposed###
     return if @disposed
-    #console.debug 'Collection#dispose', this
 
     # Fire an event to notify associated views
     @trigger 'dispose', this
-
-    # Unbind all global event handlers
-    @unsubscribeAllEvents()
-
-    # Remove all event handlers
-    @off()
 
     # Empty the list silently, but do not dispose all models since
     # they might be referenced elsewhere
     @reset [], silent: true
 
-    # Remove model constructor reference and model lists
+    # Unbind all global event handlers
+    @unsubscribeAllEvents()
+
+    # Remove all event handlers on this module
+    @off()
+
+    # If the model is a Deferred, reject it
+    # This does nothing if it was resolved before
+    @reject?()
+
+    # Remove model constructor reference, internal lists and event handlers
     properties = [
-      'model', 'models', '_byId', '_byCid'
+      'model',
+      'models', '_byId', '_byCid',
+      '_callbacks'
     ]
     delete this[prop] for prop in properties
 
     # Finished
-    #console.debug 'Collection#dispose', this, 'finished'
     @disposed = true
 
     # Your're frozen when your heart’s not open

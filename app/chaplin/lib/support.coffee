@@ -1,7 +1,7 @@
 # Feature detection
 # -----------------
 
-module.exports = support =
+support =
 
   # Test for defineProperty support
   # (IE 8 knows the method but will throw an exception)
@@ -16,4 +16,4 @@ module.exports = support =
     catch error
       return false
 
-support
+module.exports = support

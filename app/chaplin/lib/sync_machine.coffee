@@ -12,7 +12,7 @@ SYNCED   = 'synced'
 
 STATE_CHANGE = 'syncStateChange'
 
-module.exports = SyncMachine =
+SyncMachine =
 
   _syncState: UNSYNCED
   _previousSyncState: null
@@ -39,8 +39,8 @@ module.exports = SyncMachine =
     if @_syncState in [SYNCING, SYNCED]
       @_previousSync = @_syncState
       @_syncState = UNSYNCED
-      @trigger @_syncState
-      @trigger STATE_CHANGE
+      @trigger @_syncState, this, @_syncState
+      @trigger STATE_CHANGE, this, @_syncState
     # when UNSYNCED do nothing
     return
 
@@ -48,8 +48,8 @@ module.exports = SyncMachine =
     if @_syncState in [UNSYNCED, SYNCED]
       @_previousSync = @_syncState
       @_syncState = SYNCING
-      @trigger @_syncState
-      @trigger STATE_CHANGE
+      @trigger @_syncState, this, @_syncState
+      @trigger STATE_CHANGE, this, @_syncState
     # when SYNCING do nothing
     return
 
@@ -57,8 +57,8 @@ module.exports = SyncMachine =
     if @_syncState is SYNCING
       @_previousSync = @_syncState
       @_syncState = SYNCED
-      @trigger @_syncState
-      @trigger STATE_CHANGE
+      @trigger @_syncState, this, @_syncState
+      @trigger STATE_CHANGE, this, @_syncState
     # when SYNCED, UNSYNCED do nothing
     return
 
@@ -66,8 +66,8 @@ module.exports = SyncMachine =
     if @_syncState is SYNCING
       @_syncState = @_previousSync
       @_previousSync = @_syncState
-      @trigger @_syncState
-      @trigger STATE_CHANGE
+      @trigger @_syncState, this, @_syncState
+      @trigger STATE_CHANGE, this, @_syncState
     # when UNSYNCED, SYNCED do nothing
     return
 
@@ -80,6 +80,7 @@ for event in [UNSYNCED, SYNCING, SYNCED, STATE_CHANGE]
       @on event, callback, context
       callback.call(context) if @_syncState is event
 
+# Your're frozen when your heart’s not open
 Object.freeze? SyncMachine
 
-SyncMachine
+module.exports = SyncMachine

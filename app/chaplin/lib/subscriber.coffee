@@ -4,12 +4,14 @@ mediator = require 'mediator'
 # so they can be removed afterwards when disposing the object.
 #
 # Mixin this object to add the subscriber capability to any object:
-# _(SomeConstructor.prototype).extend Subscriber
+# _(object).extend Subscriber
+# Or to a prototype of a class:
+# _(@prototype).extend Subscriber
 #
 # Since Backbone 0.9.2 this abstraction just serves the purpose
 # that a handler cannot be registered twice for the same event.
 
-module.exports = Subscriber =
+Subscriber =
 
   subscribeEvent: (type, handler) ->
     if typeof type isnt 'string'
@@ -20,10 +22,10 @@ module.exports = Subscriber =
         'handler argument must be a function'
 
     # Ensure that a handler isn’t registered twice
-    mediator.unsubscribe type, handler, @
+    mediator.unsubscribe type, handler, this
 
     # Register global handler, force context to the subscriber
-    mediator.subscribe type, handler, @
+    mediator.subscribe type, handler, this
 
   unsubscribeEvent: (type, handler) ->
     if typeof type isnt 'string'
@@ -39,8 +41,9 @@ module.exports = Subscriber =
   # Unbind all global handlers
   unsubscribeAllEvents: ->
     # Remove all handlers with a context of this subscriber
-    mediator.unsubscribe null, null, @
+    mediator.unsubscribe null, null, this
 
+# Your're frozen when your heart’s not open
 Object.freeze? Subscriber
 
-Subscriber
+module.exports = Subscriber

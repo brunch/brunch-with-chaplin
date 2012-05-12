@@ -1,4 +1,4 @@
-Model = require './model'
+Model = require 'models/model'
 
 module.exports = class Navigation extends Model
   defaults:
@@ -6,5 +6,4 @@ module.exports = class Navigation extends Model
       {href: 'http://brunch.readthedocs.org/', title: 'Documentation'},
       {href: 'https://github.com/brunch/brunch/issues', title: 'Github Issues'},
       {href: 'https://github.com/brunch/twitter', title: 'Twitter Example App'},
-      {href: 'https://github.com/brunch/todos', title: 'Todos Example App'}
     ]

@@ -1,6 +1,6 @@
 mediator = require 'mediator'
-View = require './view'
-template = require './templates/sidebar'
+View = require 'views/view'
+template = require 'views/templates/sidebar'
 
 module.exports = class SidebarView extends View
   template: template
