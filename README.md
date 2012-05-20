@@ -1,5 +1,5 @@
 # Brunch with Chaplin
-Brunch with Chaplin is a fork of [Chaplin](https://github.com/moviepilot/chaplin) that is bundled to one file for usage with [Brunch](http://brunch.io).
+Brunch with Chaplin is a fork of [Chaplin](https://github.com/chaplinjs/chaplin) that is bundled to one file for usage with [Brunch](http://brunch.io).
 
 Requires Brunch 1.1+.
 
@@ -12,7 +12,7 @@ Requires Brunch 1.1+.
 
 Example application built with the lib: [Tweet your brunch](https://github.com/brunch/twitter).
 
-See [Chaplin github page](https://github.com/moviepilot/chaplin) for
+See [Chaplin github page](https://github.com/chaplinjs/chaplin) for
 documentation.
 
 ## Features
@@ -39,7 +39,7 @@ Versions of software the skeleton uses:
 * jQuery 1.7.2
 * Backbone 0.9.2
 * Underscore 1.3.3
-* Chaplin [5219d095d5d95ff396647601b214129956befe7a](https://github.com/moviepilot/chaplin/commit/5219d095d5d95ff396647601b214129956befe7a)
+* Chaplin [5219d095d5d95ff396647601b214129956befe7a](https://github.com/chaplinjs/chaplin/commit/5219d095d5d95ff396647601b214129956befe7a)
 
 ## License
 The MIT license.
