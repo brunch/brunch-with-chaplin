@@ -13,21 +13,21 @@
   
   <script src="lib/coffee-script.js"></script>
   <script type="text/coffeescript">
-  	tests = [
-  	  'models/navigation_test.coffee',
-  	  'views/home_view_test.coffee',
-  	  'views/navigation_view_test.coffee'
-  	]
-  	
-  	filesToLoad = tests.length
-  	fileLoaded = ->
-  	  filesToLoad--
-  	  
-  	  if filesToLoad == 0
-  	    $(document).ready -> mocha.run()
-  	
-  	mocha.setup('bdd')
-  	for url in tests
+    tests = [
+      'models/navigation_test.coffee',
+      'views/home_view_test.coffee',
+      'views/navigation_view_test.coffee'
+    ]
+    
+    filesToLoad = tests.length
+    fileLoaded = ->
+      filesToLoad--
+      
+      if filesToLoad == 0
+        $(document).ready -> mocha.run()
+        
+    mocha.setup('bdd')
+    for url in tests
       CoffeeScript.load url, fileLoaded
   </script>
 </head>
