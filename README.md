@@ -4,7 +4,7 @@ Brunch with Chaplin is a fork of [Chaplin](https://github.com/chaplinjs/chaplin)
 Requires Brunch 1.1+.
 
 ## Getting started
-* Create new project via executing `brunch new --skeleton git://github.com/paulmillr/brunch-with-chaplin.git`
+* Create new project via executing `brunch new <project name> --skeleton git://github.com/paulmillr/brunch-with-chaplin.git`
 * Build the project with `brunch b` or `brunch w`.
 * Open the `public/` dir to see the result.
 * Remove `home` view, controller, template & style via `brunch d scaffold home`.
