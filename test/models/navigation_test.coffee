@@ -1,4 +1,4 @@
-Navigation = require 'models/navigation'
+Navigation = window.require 'models/navigation'
 
 describe 'Navigation', ->
   
