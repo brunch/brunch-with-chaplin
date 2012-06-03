@@ -1,4 +1,4 @@
-Navigation = window.require 'models/navigation'
+Navigation = app.require 'models/navigation'
 
 describe 'Navigation', ->
   

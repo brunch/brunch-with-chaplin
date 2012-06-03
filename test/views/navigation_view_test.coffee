@@ -1,6 +1,6 @@
-mediator = window.require 'mediator'
-Navigation = window.require 'models/navigation'
-NavigationView = window.require 'views/navigation_view'
+mediator = app.require 'mediator'
+Navigation = app.require 'models/navigation'
+NavigationView = app.require 'views/navigation_view'
 
 describe 'NavigationView', ->
   
