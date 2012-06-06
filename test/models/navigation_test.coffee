@@ -1,4 +1,4 @@
-Navigation = app.require 'models/navigation'
+Navigation = require 'models/navigation'
 
 describe 'Navigation', ->
   

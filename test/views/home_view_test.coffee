@@ -1,4 +1,4 @@
-HomeView = app.require 'views/home_view'
+HomeView = require 'views/home_view'
 
 describe 'HomeView', ->
   

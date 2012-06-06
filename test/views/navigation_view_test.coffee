@@ -1,6 +1,6 @@
-mediator = app.require 'mediator'
-Navigation = app.require 'models/navigation'
-NavigationView = app.require 'views/navigation_view'
+mediator = require 'mediator'
+Navigation = require 'models/navigation'
+NavigationView = require 'views/navigation_view'
 
 describe 'NavigationView', ->
   
