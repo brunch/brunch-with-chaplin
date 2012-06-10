@@ -25,6 +25,6 @@ describe 'NavigationView', ->
     expect(@view.$el.find 'a').to.have.length 3
     
   it 'should re-render on login event', ->
-    expect(@view.render_times).to.be 1
+    expect(@view.render_times).to.equal 1
     mediator.publish 'loginStatus'
-    expect(@view.render_times).to.be 2
+    expect(@view.render_times).to.equal 2
