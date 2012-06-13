@@ -16,9 +16,19 @@ Example application built with the lib:
 See [Chaplin github page](https://github.com/chaplinjs/chaplin) for
 documentation.
 
+## Difference from Chaplin Boilerplate
+[Chaplin Boilerplate](https://github.com/chaplinjs/chaplin-boilerplate)
+is a official boilerplate all for chaplin. This skeleton is almost the same,
+except a few changes:
+
+* Added Header.
+* Added authentication abstractions (`SessionController`, `LoginView` etc).
+* CommonJS is used instead of AMD, because it's easier to use & debug.
+
 ## Features
 * HTML5Boilerplate 3.0 html & css are included.
 * CoffeeScript + Stylus + Handlebars as app languages
+(you can change this to anything you want)
 * Backbone as main framework
 * Cross-module communication using the Mediator and Publish/Subscribe patterns
 * Controllers for managing individual UI views
