@@ -30,7 +30,6 @@ enforce conventions
 * A collection view for easy and intelligent list rendering
 * Client-side authentication using service providers like Facebook, Google
 and Twitter
-* Easy debugging: just uncomment `#console.debug` in all files.
 
 ## Other
 Versions of software the skeleton uses:
@@ -39,7 +38,7 @@ Versions of software the skeleton uses:
 * jQuery 1.7.2
 * Backbone 0.9.2
 * Underscore 1.3.3
-* Chaplin [5219d095d5d95ff396647601b214129956befe7a](https://github.com/moviepilot/chaplin/commit/5219d095d5d95ff396647601b214129956befe7a)
+* Chaplin [c8c4f04ffe4262c1c014a86221c99b86b841aa9a](https://github.com/moviepilot/chaplin/commit/c8c4f04ffe4262c1c014a86221c99b86b841aa9a)
 
 ## License
 The MIT license.
