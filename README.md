@@ -1,5 +1,6 @@
 # Brunch with Chaplin
-Brunch with Chaplin is a fork of [Chaplin](https://github.com/chaplinjs/chaplin) that is bundled to one file for usage with [Brunch](http://brunch.io).
+Brunch with Chaplin is a skeleton (boilerplate) for [Brunch](http://brunch.io) 
+based on [Chaplin](https://github.com/chaplinjs/chaplin) framework.
 
 Requires Brunch 1.1+.
 
@@ -7,10 +8,10 @@ Requires Brunch 1.1+.
 * Create new project via executing `brunch new <project name> --skeleton git://github.com/paulmillr/brunch-with-chaplin.git`
 * Build the project with `brunch b` or `brunch w`.
 * Open the `public/` dir to see the result.
-* Remove `home` view, controller, template & style via `brunch d scaffold home`.
 * Write your code.
 
-Example application built with the lib: [Tweet your brunch](https://github.com/brunch/twitter).
+Example application built with the lib:
+[Ost.io](https://github.com/paulmillr/ostio).
 
 See [Chaplin github page](https://github.com/chaplinjs/chaplin) for
 documentation.
@@ -38,16 +39,12 @@ Versions of software the skeleton uses:
 * jQuery 1.7.2
 * Backbone 0.9.2
 * Underscore 1.3.3
-<<<<<<< HEAD
 * Chaplin [c8c4f04ffe4262c1c014a86221c99b86b841aa9a](https://github.com/moviepilot/chaplin/commit/c8c4f04ffe4262c1c014a86221c99b86b841aa9a)
-=======
-* Chaplin [5219d095d5d95ff396647601b214129956befe7a](https://github.com/chaplinjs/chaplin/commit/5219d095d5d95ff396647601b214129956befe7a)
->>>>>>> 70ac9898e6e4042fae35096b644027b6eafa9336
 
 ## License
 The MIT license.
 
-Copyright (c) Paul Miller (http://paulmillr.com/)
+Copyright (c) 2012 Paul Miller (http://paulmillr.com/)
 
 Copyright (c) 2012 Moviepilot GmbH, 9elements GmbH et al.
 
