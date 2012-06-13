@@ -1,16 +1,14 @@
 utils = require 'lib/utils'
-Subscriber = require 'chaplin/lib/subscriber'
+Chaplin = require 'chaplin'
 
 module.exports = class ServiceProvider
 
   # Mixin a Subscriber
-  _(@prototype).extend Subscriber
+  _(@prototype).extend Chaplin.Subscriber
 
   loading: false
 
   constructor: ->
-    ###console.debug 'ServiceProvider#constructor'###
-
     # Mixin a Deferred
     _(this).extend $.Deferred()
 
@@ -25,7 +23,6 @@ module.exports = class ServiceProvider
   disposed: false
 
   dispose: ->
-    ###console.debug 'ServiceProvider#dispose'###
     return if @disposed
 
     # Unbind handlers of global events
