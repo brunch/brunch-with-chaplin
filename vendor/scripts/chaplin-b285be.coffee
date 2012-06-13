@@ -1,3 +1,11 @@
+###
+Chaplin 1.0.0-pre.
+
+Chaplin may be freely distributed under the MIT license.
+For all details and documentation:
+http://github.com/chaplinjs/chaplin
+###
+
 'use strict'
 
 require.define
@@ -1183,6 +1191,10 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
     # If empty, all children of $list are considered
     itemSelector: null
 
+    # A class of item in collection.
+    # This property has to be overridden by a derived class.
+    itemView: null
+
     # Filtering
     # ---------
 
@@ -1199,14 +1211,14 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
     visibleItems: null
 
     # Returns an instance of the view class
-    # This method has to be overridden by a derived class.
     # This is not simply a property with a constructor so that
     # several item view constructors are possible depending
     # on the item model type.
     getView: (model) ->
-      throw new Error 'CollectionView#getView must be overridden'
-      # Example:
-      # new SomeItemView model: model
+      if @itemView?
+        new @itemView({model})
+      else
+        throw new Error 'CollectionView#itemView must be overridden'
 
     # In contrast to normal views, a template is not mandatory
     # for CollectionViews. Provide an empty `getTemplateFunction`
@@ -1222,6 +1234,8 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
         render: true      # Render the view immediately per default
         renderItems: true # Render all items immediately per default
         filterer: null    # No filter function
+
+      @itemView = options.itemView if options.itemView?
 
       # Initialize lists for views and visible items
       @viewsByCid = {}
