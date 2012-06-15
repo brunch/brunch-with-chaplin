@@ -1,12 +1,11 @@
 HomeView = require 'views/home_view'
 
 describe 'HomeView', ->
-  
-  beforeEach ->
+  beforeEach =>
     @view = new HomeView
 
-  afterEach ->
+  afterEach =>
     @view.dispose()
-  
-  it 'should auto-render', ->
+
+  it 'should auto-render', =>
     expect(@view.$el.find 'h1').to.have.length 1
