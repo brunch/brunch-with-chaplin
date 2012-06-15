@@ -6,6 +6,8 @@ exports.config =
       joinTo:
         'javascripts/app.js': /^app/
         'javascripts/vendor.js': /^vendor/
+        'test/javascripts/test.js': /^test\/(?!vendor)/
+        'test/javascripts/test-vendor.js': /^test\/(?=vendor)/
       order:
         before: [
           'vendor/scripts/console-helper.js',
@@ -16,7 +18,9 @@ exports.config =
 
     stylesheets:
       defaultExtension: 'styl'
-      joinTo: 'stylesheets/app.css'
+      joinTo:
+        'stylesheets/app.css': /^(app|vendor)/
+        'test/stylesheets/test.css': /^test/
       order:
         before: ['vendor/styles/normalize.css']
         after: ['vendor/styles/helpers.css']
