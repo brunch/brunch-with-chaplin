@@ -2,10 +2,12 @@
 Brunch with Chaplin is a skeleton (boilerplate) for [Brunch](http://brunch.io) 
 based on [Chaplin](https://github.com/chaplinjs/chaplin) framework.
 
-Requires Brunch 1.1+.
+Requires Brunch 1.3+.
 
 ## Getting started
-* Create new project via executing `brunch new <project name> --skeleton git://github.com/paulmillr/brunch-with-chaplin.git`
+* Create new project via executing `brunch new <project name>`.
+Brunch with chaplin is a default application skeleton for Brunch,
+so you don't need to specify `--skeleton` option for the command.
 * Build the project with `brunch b` or `brunch w`.
 * Open the `public/` dir to see the result.
 * Write your code.
