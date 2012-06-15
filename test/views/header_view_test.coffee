@@ -11,7 +11,7 @@ class NavigationViewTest extends NavigationView
 
 describe 'NavigationView', ->
   beforeEach =>
-    @model = new Navigation
+    @model = new Navigation()
     @view = new NavigationViewTest({@model})
 
   afterEach =>
@@ -22,6 +22,6 @@ describe 'NavigationView', ->
     expect(@view.$el.find 'a').to.have.length 3
 
   it 'should re-render on login event', =>
-    expect(@view.renderTimes).to.be 1
+    expect(@view.renderTimes).to.equal 1
     mediator.publish 'loginStatus'
-    expect(@view.renderTimes).to.be 2
+    expect(@view.renderTimes).to.equal 2

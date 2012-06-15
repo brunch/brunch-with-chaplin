@@ -1,13 +1,10 @@
-tests = [
-  'test/models/header_test.coffee',
-  'test/views/home_view_test.coffee',
-  'test/views/navigation_view_test.coffee'
-]
+tests = require 'test/modules'
 
 mocha.setup('bdd')
+expect = chai.expect
 
-for test in tests
-  require test
+for testPath in tests
+  require "test/#{testPath}_test"
 
 $ ->
   mocha.run()
