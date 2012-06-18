@@ -1,8 +1,10 @@
-HomeView = require 'views/home_view'
+HomePageView = require 'views/home_page_view'
 
-describe 'HomeView', ->
+describe 'HomePageView', ->
+  @view = null
+
   beforeEach =>
-    @view = new HomeView
+    @view = new HomePageView
 
   afterEach =>
     @view.dispose()

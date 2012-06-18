@@ -1,18 +1,21 @@
 mediator = require 'mediator'
-Navigation = require 'models/navigation'
-NavigationView = require 'views/navigation_view'
+Header = require 'models/header'
+HeaderView = require 'views/header_view'
 
-class NavigationViewTest extends NavigationView
+class HeaderViewTest extends HeaderView
   renderTimes: 0
 
   render: ->
     super
     @renderTimes += 1
 
-describe 'NavigationView', ->
+describe 'HeaderView', ->
+  @model = null
+  @view = null
+
   beforeEach =>
-    @model = new Navigation()
-    @view = new NavigationViewTest({@model})
+    @model = new Header()
+    @view = new HeaderViewTest({@model})
 
   afterEach =>
     @view.dispose()

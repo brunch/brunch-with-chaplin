@@ -1,8 +1,8 @@
-Navigation = require 'models/navigation'
+Header = require 'models/header'
 
-describe 'Navigation', ->
+describe 'Header', ->
   beforeEach =>
-    @model = new Navigation()
+    @model = new Header()
 
   afterEach =>
     @model.dispose()
