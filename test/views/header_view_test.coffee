@@ -10,21 +10,18 @@ class HeaderViewTest extends HeaderView
     @renderTimes += 1
 
 describe 'HeaderView', ->
-  model = null
-  view = null
-
   beforeEach ->
-    model = new Header()
-    view = new HeaderViewTest({model})
+    @model = new Header()
+    @view = new HeaderViewTest({@model})
 
   afterEach ->
-    view.dispose()
-    model.dispose()
+    @view.dispose()
+    @model.dispose()
 
   it 'should display 3 links', ->
-    expect(view.$el.find 'a').to.have.length 3
+    expect(@view.$el.find 'a').to.have.length 3
 
   it 'should re-render on login event', ->
-    expect(view.renderTimes).to.equal 1
+    expect(@view.renderTimes).to.equal 1
     mediator.publish 'loginStatus'
-    expect(view.renderTimes).to.equal 2
+    expect(@view.renderTimes).to.equal 2
