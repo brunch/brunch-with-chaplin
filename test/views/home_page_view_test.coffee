@@ -1,13 +1,13 @@
 HomePageView = require 'views/home_page_view'
 
 describe 'HomePageView', ->
-  @view = null
+  view = null
 
-  beforeEach =>
-    @view = new HomePageView
+  beforeEach ->
+    view = new HomePageView
 
-  afterEach =>
-    @view.dispose()
+  afterEach ->
+    view.dispose()
 
-  it 'should auto-render', =>
-    expect(@view.$el.find 'h1').to.have.length 1
+  it 'should auto-render', ->
+    expect(view.$el.find 'h1').to.have.length 1
