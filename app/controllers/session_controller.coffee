@@ -1,14 +1,15 @@
 mediator = require 'mediator'
-utils = require 'lib/utils'
-User = require 'models/user'
 Controller = require 'controllers/base/controller'
+User = require 'models/user'
 LoginView = require 'views/login_view'
 
 module.exports = class SessionController extends Controller
   # Service provider instances as static properties
   # This just hardcoded here to avoid async loading of service providers.
   # In the end you might want to do this.
-  @serviceProviders = {}
+  @serviceProviders = {
+    # facebook: new Facebook()
+  }
 
   # Was the login status already determined?
   loginStatusDetermined: false
@@ -46,8 +47,7 @@ module.exports = class SessionController extends Controller
 
   # Instantiate the user with the given data
   createUser: (userData) ->
-    user = new User userData
-    mediator.setUser user
+    mediator.user = new User userData
 
   # Try to get an existing session from one of the login providers
   getSession: ->
@@ -142,4 +142,4 @@ module.exports = class SessionController extends Controller
     # Dispose the user model
     mediator.user.dispose()
     # Nullify property on the mediator
-    mediator.setUser null
+    mediator.user = null
