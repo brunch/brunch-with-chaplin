@@ -14,6 +14,7 @@ require.define
   'backbone': (require, exports, module) -> module.exports = Backbone
 
 require.define 'chaplin/application': (exports, require, module) ->
+  Backbone = require 'backbone'
   mediator = require 'chaplin/mediator'
   Dispatcher = require 'chaplin/dispatcher'
   Layout = require 'chaplin/views/layout'
@@ -23,6 +24,9 @@ require.define 'chaplin/application': (exports, require, module) ->
   # ----------------------------
 
   module.exports = class Application
+
+    # Borrow the static extend method from Backbone
+    @extend = Backbone.Model.extend
 
     # The site title used in the document title
     title: ''
@@ -65,7 +69,7 @@ require.define 'chaplin/application': (exports, require, module) ->
       return if @disposed
 
       properties = ['dispatcher', 'layout', 'router']
-      for prop in properties
+      for prop in properties when this[prop]?
         this[prop].dispose()
         delete this[prop]
 
@@ -132,11 +136,15 @@ require.define 'chaplin/mediator': (exports, require, module) ->
 
 require.define 'chaplin/dispatcher': (exports, require, module) ->
   _ = require 'underscore'
+  Backbone = require 'backbone'
   mediator = require 'chaplin/mediator'
   utils = require 'chaplin/lib/utils'
   Subscriber = require 'chaplin/lib/subscriber'
 
   module.exports = class Dispatcher
+
+    # Borrow the static extend method from Backbone
+    @extend = Backbone.Model.extend
 
     # Mixin a Subscriber
     _(@prototype).extend Subscriber
@@ -246,6 +254,9 @@ require.define 'chaplin/dispatcher': (exports, require, module) ->
       # Passing the params and the old controller name
       controller[action] params, currentControllerName
 
+      # Stop if the action triggered a redirect
+      return if controller.redirected
+
       # Save the new controller
       @previousControllerName = currentControllerName
       @currentControllerName = controllerName
@@ -305,9 +316,14 @@ require.define 'chaplin/dispatcher': (exports, require, module) ->
 
 require.define 'chaplin/controllers/controller': (exports, require, module) ->
   _ = require 'underscore'
+  Backbone = require 'backbone'
+  mediator = require 'chaplin/mediator'
   Subscriber = require 'chaplin/lib/subscriber'
 
   module.exports = class Controller
+
+    # Borrow the static extend method from Backbone
+    @extend = Backbone.Model.extend
 
     # Mixin a Subscriber
     _(@prototype).extend Subscriber
@@ -315,7 +331,11 @@ require.define 'chaplin/controllers/controller': (exports, require, module) ->
     view: null
     currentId: null
 
-    # You should set a title property and a historyURL property or method
+    # Internal flag which stores whether `redirectTo`
+    # was called in the current action
+    redirected: false
+
+    # You should set a `title` property and a `historyURL` property or method
     # on the derived controller. Like this:
     # title: 'foo'
     # historyURL: 'foo'
@@ -325,6 +345,21 @@ require.define 'chaplin/controllers/controller': (exports, require, module) ->
       @initialize arguments...
 
     initialize: ->
+      # Empty per default
+
+    # Redirection
+    # -----------
+
+    redirectTo: (arg1, action, params) ->
+      @redirected = true
+      if arguments.length is 1
+        # URL was passed, try to route it
+        mediator.publish '!router:route', arg1, (routed) ->
+          unless routed
+            throw new Error 'Controller#redirectTo: no route matched'
+      else
+        # Assume controller and action names were passed
+        mediator.publish '!startupController', arg1, action, params
 
     # Disposal
     # --------
@@ -344,8 +379,8 @@ require.define 'chaplin/controllers/controller': (exports, require, module) ->
       # Unbind handlers of global events
       @unsubscribeAllEvents()
 
-      # Remove properties
-      properties = ['currentId']
+      # Remove properties which are not disposable
+      properties = ['currentId', 'redirected']
       delete this[prop] for prop in properties
 
       # Finished
@@ -582,6 +617,9 @@ require.define 'chaplin/views/layout': (exports, require, module) ->
   Subscriber = require 'chaplin/lib/subscriber'
 
   module.exports = class Layout # This class does not extend View
+
+    # Borrow the static extend method from Backbone
+    @extend = Backbone.Model.extend
 
     # Mixin a Subscriber
     _(@prototype).extend Subscriber
@@ -1218,7 +1256,8 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
       if @itemView?
         new @itemView({model})
       else
-        throw new Error 'CollectionView#itemView must be overridden'
+        throw new Error 'The CollectionView#itemView property must be
+defined (or the getView() must be overridden)'
 
     # In contrast to normal views, a template is not mandatory
     # for CollectionViews. Provide an empty `getTemplateFunction`
@@ -1337,7 +1376,7 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
 
     showHideLoadingIndicator: ->
       # Only show the loading indicator if the collection is empty.
-      # Otherwise loading more items in order to appendthem would
+      # Otherwise loading more items in order to append them would
       # show the loading indicator. If you want the indicator to
       # show up in this case, you need to overwrite this method to
       # disable the check.
@@ -1565,23 +1604,34 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
 
 require.define 'chaplin/lib/route': (exports, require, module) ->
   _ = require 'underscore'
+  Backbone = require 'backbone'
   mediator = require 'chaplin/mediator'
+  Controller = require 'chaplin/controllers/controller'
 
   module.exports = class Route
 
-    reservedParams = 'path changeURL'.split(' ')
+    # Borrow the static extend method from Backbone
+    @extend = Backbone.Model.extend
+
+    reservedParams = ['path', 'changeURL']
     # Taken from Backbone.Router
     escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
 
     queryStringFieldSeparator = '&'
     queryStringValueSeparator = '='
 
+    # Create a route for a URL pattern and a controller action
+    # e.g. new Route '/users/:id', 'users#show'
     constructor: (pattern, target, @options = {}) ->
       # Save the raw pattern
       @pattern = pattern
 
       # Separate target into controller and controller action
       [@controller, @action] = target.split('#')
+
+      # Check if the action is a reserved name
+      if _(Controller.prototype).has @action
+        throw new Error 'Route: You should not use existing controller properties as action names'
 
       @createRegExp()
 
@@ -1608,7 +1658,7 @@ require.define 'chaplin/lib/route': (exports, require, module) ->
       # Save parameter name
       @paramNames.push paramName
       # Replace with a character class
-      '([\\w-]+)'
+      '([^\/]+)'
 
     # Test if the route matches to a path (called by Backbone.History#loadUrl)
     test: (path) ->
@@ -1719,6 +1769,10 @@ require.define 'chaplin/lib/router': (exports, require, module) ->
 
   module.exports = class Router # This class does not extend Backbone.Router
 
+    # Borrow the static extend method from Backbone
+    @extend = Backbone.Model.extend
+
+    # Mixin a Subscriber
     _(@prototype).extend Subscriber
 
     constructor: (@options = {}) ->
@@ -1741,7 +1795,7 @@ require.define 'chaplin/lib/router': (exports, require, module) ->
 
     # Stop the current Backbone.History instance from observing URL changes
     stopHistory: ->
-      Backbone.history.stop()
+      Backbone.history.stop() if Backbone.History.started
 
     # Connect an address with a controller action
     # Directly create a route on the Backbone.History instance

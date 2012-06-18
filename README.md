@@ -51,7 +51,7 @@ Versions of software the skeleton uses:
 * jQuery 1.7.2
 * Backbone 0.9.2
 * Underscore 1.3.3
-* Chaplin [b285befaf3c4fb26f58bb398dbc383776bc3b659](https://github.com/moviepilot/chaplin/commit/b285befaf3c4fb26f58bb398dbc383776bc3b659)
+* Chaplin [2dc3b2](https://github.com/moviepilot/chaplin/commit/2dc3b2e2d0eb95678367aad3e2af0f16c889bac7)
 
 ## License
 The MIT license.
