@@ -14,7 +14,7 @@ so you don't need to specify `--skeleton` option for the command.
 * Open the `public/` dir to see the result.
 * Write your code.
 
-Example application built with the lib:
+Example application built with the skeleton:
 [Ost.io](https://github.com/paulmillr/ostio).
 
 See [Chaplin github page](https://github.com/chaplinjs/chaplin) for
