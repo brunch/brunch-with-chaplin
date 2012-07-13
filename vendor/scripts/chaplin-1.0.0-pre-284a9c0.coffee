@@ -275,7 +275,7 @@ require.define 'chaplin/dispatcher': (exports, require, module) ->
 
     # Change the URL to the new controller using the router
     adjustURL: (controller, params) ->
-      if params.path
+      if params.path or params.path is ''
         # Just use the matched path
         url = params.path
 
@@ -460,6 +460,8 @@ require.define 'chaplin/models/collection': (exports, require, module) ->
             # Insert new model
             @add model, at: i
 
+      return
+
     # Disposal
     # --------
 
@@ -567,7 +569,7 @@ require.define 'chaplin/models/model': (exports, require, module) ->
     # (i.e. an object which has the attributes as prototype)
     # so primitive values might be added and altered safely.
     # Map models to their attributes, recursively.
-    serialize: (model) ->
+    serialize: ->
       serializeAttributes this, @getAttributes()
 
     # Disposal
@@ -646,6 +648,7 @@ require.define 'chaplin/views/layout': (exports, require, module) ->
       @title = options.title
       @settings = _(options).defaults
         routeLinks: true
+        # Per default, jump to the top of the page
         scrollTo: [0, 0]
 
       # Listen to global events: Starting and disposing of controllers
@@ -672,8 +675,10 @@ require.define 'chaplin/views/layout': (exports, require, module) ->
 
     # Handler for the global beforeControllerDispose event
     hideOldView: (controller) ->
-      # Jump to the top of the page
-      scrollTo @settings.scrollTo if @settings.scrollTo
+      # Reset the scroll position
+      scrollTo = @settings.scrollTo
+      if scrollTo
+        window.scrollTo scrollTo[0], scrollTo[1]
 
       # Hide the current view
       view = controller.view
@@ -717,17 +722,19 @@ require.define 'chaplin/views/layout': (exports, require, module) ->
       return if utils.modifierKeyPressed(event)
 
       el = event.currentTarget
-      href = el.getAttribute 'href'
+      $el = $(el)
+      href = $el.attr 'href'
       # Ignore empty paths even if it is a valid relative URL
       # Ignore links to fragment identifiers
-      return if href is null or
-        href is '' or
+      return if href is '' or
+        href is undefined or
         href.charAt(0) is '#' or
-        $(el).hasClass('noscript')
+        $el.hasClass('noscript')
 
       # Is it an external link?
       currentHostname = location.hostname.replace('.', '\\.')
-      external = not ///#{currentHostname}$///i.test(el.hostname)
+      external = el.hostname isnt '' and
+        not ///#{currentHostname}$///i.test(el.hostname)
       if external
         # Open external links normally
         # You might want to enforce opening in a new tab here:
@@ -1009,7 +1016,7 @@ require.define 'chaplin/views/view': (exports, require, module) ->
     pass: (attribute, selector) ->
       @modelBind "change:#{attribute}", (model, value) =>
         $el = @$(selector)
-        if $el.is(':input')
+        if $el.is('input, textarea, select, button')
           $el.val value
         else
           $el.text value
@@ -1203,6 +1210,12 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
     # When new items are added, their views are faded in.
     # Animation duration in milliseconds (set to 0 to disable fade in)
     animationDuration: 500
+
+    # By default, fading in is done by javascript function which can be
+    # slow on mobile devices. CSS animations are faster,
+    # but require user's manual definitions.
+    # CSS classes used are: animated-item-view, animated-item-view-end.
+    useCssAnimation: false
 
     # A collection view may have a template and use one of its child elements
     # as the container of the item views. If you specify `listSelector`, the
@@ -1452,7 +1465,7 @@ defined (or the getView() must be overridden)'
         view = @viewsByCid[item.cid]
         if view
           # Re-insert the view
-          @insertView item, view, index, 0
+          @insertView item, view, index, false
         else
           # Create a new view, render and insert it
           @renderAndInsertItem item, index
@@ -1483,7 +1496,7 @@ defined (or the getView() must be overridden)'
       view
 
     # Inserts a view into the list at the proper position
-    insertView: (item, view, index = null, animationDuration = @animationDuration) ->
+    insertView: (item, view, index = null, enableAnimation = true) ->
       # Get the insertion offset
       position = if typeof index is 'number'
         index
@@ -1502,8 +1515,11 @@ defined (or the getView() must be overridden)'
 
       if included
         # Make view transparent if animation is enabled
-        $viewEl.addClass 'opacity-transitionable' if animationDuration
-        $viewEl.css 'opacity', 0 if animationDuration
+        if enableAnimation
+          if @useCssAnimation
+            $viewEl.addClass 'animated-item-view'
+          else
+            $viewEl.css 'opacity', 0
       else
         # Hide the view if it’s filtered
         $viewEl.css 'display', 'none'
@@ -1534,9 +1550,16 @@ defined (or the getView() must be overridden)'
       @updateVisibleItems item, included
 
       # Fade the view in if it was made transparent before
-      if animationDuration and included
-        $viewEl.addClass 'opacity-transitionable-end'
-        $viewEl.animate {opacity: 1}, animationDuration
+      if enableAnimation and included
+        if @useCssAnimation
+          # Wait for DOM state change.
+          setTimeout =>
+            $viewEl.addClass 'animated-item-view-end'
+          , 0
+        else
+          $viewEl.animate {opacity: 1}, @animationDuration
+
+      return
 
     # Remove the view for an item
     removeViewForItem: (item) ->
@@ -1658,7 +1681,7 @@ require.define 'chaplin/lib/route': (exports, require, module) ->
       # Save parameter name
       @paramNames.push paramName
       # Replace with a character class
-      '([^\/]+)'
+      '([^\/\?]+)'
 
     # Test if the route matches to a path (called by Backbone.History#loadUrl)
     test: (path) ->
@@ -1800,10 +1823,8 @@ require.define 'chaplin/lib/router': (exports, require, module) ->
     # Connect an address with a controller action
     # Directly create a route on the Backbone.History instance
     match: (pattern, target, options = {}) =>
-
       # Create a route
       route = new Route pattern, target, options
-
       # Register the route at the Backbone.History instance
       Backbone.history.route route, route.handler
 
@@ -1815,7 +1836,7 @@ require.define 'chaplin/lib/router': (exports, require, module) ->
       # Remove leading hash or slash
       path = path.replace /^(\/#|\/)/, ''
 
-      for handler in Backbone.history.handlers
+      for handler in Backbone.history.handlers.slice().reverse()
         if handler.route.test(path)
           handler.callback path, changeURL: true
           return true
@@ -2050,6 +2071,7 @@ require.define 'chaplin/lib/utils': (exports, require, module) ->
           configurable: false
         (obj, properties...) ->
           for prop in properties
+            readonlyDescriptor.value = obj[prop]
             Object.defineProperty obj, prop, readonlyDescriptor
           true
       else
