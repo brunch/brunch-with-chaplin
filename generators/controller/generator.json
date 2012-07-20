@@ -1,0 +1,9 @@
+{
+  "files": [
+    {
+      "from": "controller.coffee.generator",
+      "to": "app/controllers/{{name}}_controller.coffee"
+    }
+  ],
+  "dependencies": ["controller_test"]
+}

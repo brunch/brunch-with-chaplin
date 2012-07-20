@@ -1,0 +1,5 @@
+{{camelizedName}} = require 'models/{{name}}'
+
+describe '{{camelizedName}}', ->
+  beforeEach ->
+    @model = new {{camelizedName}}()

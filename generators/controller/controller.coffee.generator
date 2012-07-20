@@ -1,0 +1,3 @@
+Controller = require 'controllers/base/controller'
+
+module.exports = class {{camelizedPluralName}}Controller extends Controller

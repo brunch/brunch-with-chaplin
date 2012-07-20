@@ -1,0 +1,9 @@
+{
+  "files": [
+    {
+      "from": "file.styl.generator",
+      "to": "app/views/styles/{{name}}.styl"
+    }
+  ],
+  "dependencies": []
+}

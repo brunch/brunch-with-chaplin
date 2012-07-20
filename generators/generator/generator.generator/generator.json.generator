@@ -1,0 +1,6 @@
+{
+  "files": {
+    "{{name}}.coffee.generator": "app/{{{name}}}.coffee"
+  },
+  "dependencies": []
+}

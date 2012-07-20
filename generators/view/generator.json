@@ -1,0 +1,9 @@
+{
+  "files": [
+    {
+      "from": "view.coffee.generator",
+      "to": "app/views/{{name}}_view.coffee"
+    }
+  ],
+  "dependencies": ["view_test"]
+}

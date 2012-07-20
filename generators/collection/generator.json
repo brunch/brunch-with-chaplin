@@ -1,0 +1,9 @@
+{
+  "files": [
+    {
+      "from": "collection.coffee.generator",
+      "to": "app/models/{{name}}.coffee"
+    }
+  ],
+  "dependencies": ["collection_test"]
+}
