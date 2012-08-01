@@ -1,9 +1,11 @@
 {
   "files": [
     {
-      "from": "model.coffee.generator",
+      "from": "model.coffee.hbs",
       "to": "app/models/{{name}}.coffee"
     }
   ],
-  "dependencies": ["model_test"]
+  "dependencies": [
+    {"name": "model_test", "params": "{{name}}"}
+  ]
 }

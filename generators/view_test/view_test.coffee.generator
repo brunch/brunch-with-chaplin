@@ -1,5 +1,0 @@
-{{camelizedName}}View = require 'views/{{name}}_view'
-
-describe '{{camelizedName}}View', ->
-  beforeEach ->
-    @view = new {{camelizedName}}View()

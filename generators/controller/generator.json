@@ -1,9 +1,11 @@
 {
   "files": [
     {
-      "from": "controller.coffee.generator",
+      "from": "controller.coffee.hbs",
       "to": "app/controllers/{{name}}_controller.coffee"
     }
   ],
-  "dependencies": ["controller_test"]
+  "dependencies": [
+    {"name": "controller_test", "params": "{{name}}"}
+  ]
 }

@@ -1,7 +1,7 @@
 {
   "files": [
     {
-      "from": "view_test.coffee.generator",
+      "from": "view_test.coffee.hbs",
       "to": "test/views/{{name}}_view.coffee"
     }
   ],

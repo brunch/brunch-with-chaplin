@@ -1,7 +1,7 @@
 {
   "files": [
     {
-      "from": "collection_view.coffee.generator",
+      "from": "collection_view.coffee.hbs",
       "to": "app/views/{{name}}.coffee"
     }
   ],

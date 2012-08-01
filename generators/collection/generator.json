@@ -1,9 +1,11 @@
 {
   "files": [
     {
-      "from": "collection.coffee.generator",
+      "from": "collection.coffee.hbs",
       "to": "app/models/{{name}}.coffee"
     }
   ],
-  "dependencies": ["collection_test"]
+  "dependencies": [
+    {"name": "collection_test", "params": "{{name}}"}
+  ]
 }

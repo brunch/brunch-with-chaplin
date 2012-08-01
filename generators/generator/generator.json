@@ -1,8 +1,12 @@
 {
   "files": [
     {
-      "from": ".coffee.generator",
-      "to": "app//{{name}}.coffee"
+      "from": "generator.json.hbs",
+      "to": "generators/{{name}}/generator.json"
+    },
+    {
+      "from": "generated_file.coffee.hbs",
+      "to": "generators/{{name}}/{{name}}.coffee.hbs"
     }
   ],
   "dependencies": []

@@ -1,7 +1,7 @@
 {
   "files": [
     {
-      "from": "file.styl.generator",
+      "from": "file.styl.hbs",
       "to": "app/views/styles/{{name}}.styl"
     }
   ],

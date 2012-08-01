@@ -1,5 +1,0 @@
-Collection = require 'models/base/collection'
-{{camelizedName}} = require 'models/{{name}}'
-
-module.exports = class {{camelizedPluralName}} extends Collection
-  model: {{camelizedName}}
