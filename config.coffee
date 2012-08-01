@@ -27,10 +27,3 @@ exports.config =
 
     templates:
       joinTo: 'javascripts/app.js'
-
-  generatorsRelations:
-    controller: ['controller_test']
-    collection: ['collection_test']
-    model: ['model_test']
-    view: ['view_test', 'template', 'style']
-    scaffold: ['controller', 'model', 'view', 'collection_view']
