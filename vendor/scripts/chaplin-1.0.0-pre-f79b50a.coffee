@@ -724,18 +724,27 @@ require.define 'chaplin/views/layout': (exports, require, module) ->
       el = event.currentTarget
       $el = $(el)
       href = $el.attr 'href'
-      # Ignore empty paths even if it is a valid relative URL
-      # Ignore links to fragment identifiers
-      return if href is '' or
-        href is undefined or
+      protocol = el.protocol
+
+      protocolIsExternal = if protocol
+        protocol not in ['http:', 'https:', 'file:']
+      else
+        false
+
+      # Ignore external URLs.
+      # Technically an empty string is a valid relative URL
+      # but it doesn’t make sense to route it.')
+      return if href is undefined or
+        href is '' or
         href.charAt(0) is '#' or
+        protocolIsExternal or
+        $el.attr('target') is '_blank' or
+        $el.attr('rel') is 'external' or
         $el.hasClass('noscript')
 
       # Is it an external link?
-      currentHostname = location.hostname.replace('.', '\\.')
-      external = el.hostname isnt '' and
-        not ///#{currentHostname}$///i.test(el.hostname)
-      if external
+      internal = el.hostname is '' or location.hostname is el.hostname
+      unless internal
         # Open external links normally
         # You might want to enforce opening in a new tab here:
         #event.preventDefault()
@@ -1823,10 +1832,14 @@ require.define 'chaplin/lib/router': (exports, require, module) ->
     # Connect an address with a controller action
     # Directly create a route on the Backbone.History instance
     match: (pattern, target, options = {}) =>
-      # Create a route
+      # Create the route
       route = new Route pattern, target, options
-      # Register the route at the Backbone.History instance
-      Backbone.history.route route, route.handler
+      # Register the route at the Backbone.History instance.
+      # Don’t use Backbone.history.route here because it calls
+      # handlers.unshift, inserting the handler at the top of the list.
+      # Since we want routes to match in the order they were specified,
+      # we’re appending the route at the end.
+      Backbone.history.handlers.push {route, callback: route.handler}
 
     # Route a given URL path manually, returns whether a route matched
     # This looks quite like Backbone.History::loadUrl but it
@@ -1835,8 +1848,7 @@ require.define 'chaplin/lib/router': (exports, require, module) ->
     route: (path) =>
       # Remove leading hash or slash
       path = path.replace /^(\/#|\/)/, ''
-
-      for handler in Backbone.history.handlers.slice().reverse()
+      for handler in Backbone.history.handlers
         if handler.route.test(path)
           handler.callback path, changeURL: true
           return true
