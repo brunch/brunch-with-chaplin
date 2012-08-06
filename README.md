@@ -4,7 +4,7 @@
 Brunch with Chaplin is a skeleton (boilerplate) for [Brunch](http://brunch.io) 
 based on [Chaplin](https://github.com/chaplinjs/chaplin) framework.
 
-Requires Brunch 1.3+.
+Requires Brunch 1.4+.
 
 ## Getting started
 * Create new project via executing `brunch new <project name>`.
@@ -30,7 +30,7 @@ except a few changes:
 * CommonJS is used instead of AMD, because it's easier to use & debug.
 
 ## Features
-* HTML5Boilerplate 3.0 html & css are included.
+* HTML5Boilerplate 3.0.3 html & css are included.
 * CoffeeScript + Stylus + Handlebars as app languages
 (you can change this to anything you want)
 * Backbone as main framework
@@ -45,15 +45,6 @@ enforce conventions
 * A collection view for easy and intelligent list rendering
 * Client-side authentication using service providers like Facebook, Google
 and Twitter
-
-## Other
-Versions of software the skeleton uses:
-
-* HTML5Boilerplate 3.0.3
-* jQuery 1.7.2
-* Backbone 0.9.2
-* Underscore 1.3.3
-* chaplin 1.0.0-pre [1d457f2](https://github.com/chaplinjs/chaplin/commit/284a9c0)
 
 ## License
 The MIT license.
