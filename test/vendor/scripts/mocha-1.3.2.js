@@ -407,7 +407,7 @@ module.exports = Context;
 function Context(){}
 
 /**
- * Set the context `Runnable` to `runnable`.
+ * Set or get the context `Runnable` to `runnable`.
  *
  * @param {Runnable} runnable
  * @return {Context}
@@ -415,7 +415,8 @@ function Context(){}
  */
 
 Context.prototype.runnable = function(runnable){
-  this._runnable = runnable;
+  if (0 == arguments.length) return this._runnable;
+  this.test = this._runnable = runnable;
   return this;
 };
 
@@ -428,7 +429,7 @@ Context.prototype.runnable = function(runnable){
  */
 
 Context.prototype.timeout = function(ms){
-  this._runnable.timeout(ms);
+  this.runnable().timeout(ms);
   return this;
 };
 
@@ -441,9 +442,9 @@ Context.prototype.timeout = function(ms){
 
 Context.prototype.inspect = function(){
   return JSON.stringify(this, function(key, val){
-    return '_runnable' == key
-      ? undefined
-      : val;
+    if ('_runnable' == key) return;
+    if ('test' == key) return;
+    return val;
   }, 2);
 };
 
@@ -484,6 +485,25 @@ Hook.prototype = new Runnable;
 Hook.prototype.constructor = Hook;
 
 
+/**
+ * Get or set the test `err`.
+ *
+ * @param {Error} err
+ * @return {Error}
+ * @api public
+ */
+
+Hook.prototype.error = function(err){
+  if (0 == arguments.length) {
+    var err = this._error;
+    this._error = null;
+    return err;
+  }
+
+  this._error = err;
+};
+
+
 }); // module: hook.js
 
 require.register("interfaces/bdd.js", function(module, exports, require){
@@ -516,11 +536,6 @@ module.exports = function(suite){
   var suites = [suite];
 
   suite.on('pre-require', function(context){
-
-    // noop variants
-
-    context.xdescribe = function(){};
-    context.xit = function(){};
 
     /**
      * Execute before running tests.
@@ -555,6 +570,18 @@ module.exports = function(suite){
     };
 
     /**
+     * Pending describe.
+     */
+
+    context.xdescribe = context.xcontext = function(title, fn){
+      var suite = Suite.create(suites[0], title);
+      suite.pending = true;
+      suites.unshift(suite);
+      fn();
+      suites.shift();
+    };
+
+    /**
      * Describe a "suite" with the given `title`
      * and callback `fn` containing nested suites
      * and/or tests.
@@ -574,7 +601,17 @@ module.exports = function(suite){
      */
 
     context.it = context.specify = function(title, fn){
-      suites[0].addTest(new Test(title, fn));
+      var suite = suites[0];
+      if (suite.pending) var fn = null;
+      suite.addTest(new Test(title, fn));
+    };
+
+    /**
+     * Pending test case.
+     */
+
+    context.xit = context.xspecify = function(title){
+      context.it(title);
     };
   });
 };
@@ -866,12 +903,6 @@ var path = require('browser/path');
 exports = module.exports = Mocha;
 
 /**
- * Library version.
- */
-
-exports.version = '1.2.0';
-
-/**
  * Expose internals.
  */
 
@@ -971,13 +1002,15 @@ Mocha.prototype.ui = function(name){
  * @api private
  */
 
-Mocha.prototype.loadFiles = function(){
+Mocha.prototype.loadFiles = function(fn){
   var suite = this.suite;
+  var pending = this.files.length;
   this.files.forEach(function(file){
     file = path.resolve(file);
     suite.emit('pre-require', global, file);
     suite.emit('require', require(file), file);
     suite.emit('post-require', global, file);
+    --pending || (fn && fn());
   });
 };
 
@@ -987,7 +1020,7 @@ Mocha.prototype.loadFiles = function(){
  * @api private
  */
 
-Mocha.prototype.growl = function(runner, reporter) {
+Mocha.prototype._growl = function(runner, reporter) {
   var notify = require('growl');
 
   runner.on('end', function(){
@@ -1021,6 +1054,55 @@ Mocha.prototype.grep = function(re){
 };
 
 /**
+ * Invert `.grep()` matches.
+ *
+ * @return {Mocha}
+ * @api public
+ */
+
+Mocha.prototype.invert = function(){
+  this.options.invert = true;
+  return this;
+};
+
+/**
+ * Ignore global leaks.
+ *
+ * @return {Mocha}
+ * @api public
+ */
+
+Mocha.prototype.ignoreLeaks = function(){
+  this.options.ignoreLeaks = true;
+  return this;
+};
+
+/**
+ * Enable growl support.
+ *
+ * @return {Mocha}
+ * @api public
+ */
+
+Mocha.prototype.growl = function(){
+  this.options.growl = true;
+  return this;
+};
+
+/**
+ * Ignore `globals`.
+ *
+ * @param {Array} globals
+ * @return {Mocha}
+ * @api public
+ */
+
+Mocha.prototype.globals = function(globals){
+  this.options.globals = globals;
+  return this;
+};
+
+/**
  * Run tests and invoke `fn()` when complete.
  *
  * @param {Function} fn
@@ -1035,9 +1117,9 @@ Mocha.prototype.run = function(fn){
   var runner = new exports.Runner(suite);
   var reporter = new this._reporter(runner);
   runner.ignoreLeaks = options.ignoreLeaks;
-  if (options.grep) runner.grep(options.grep);
+  if (options.grep) runner.grep(options.grep, options.invert);
   if (options.globals) runner.globals(options.globals);
-  if (options.growl) this.growl(runner, reporter);
+  if (options.growl) this._growl(runner, reporter);
   return runner.run(fn);
 };
 
@@ -1120,7 +1202,7 @@ exports.colors = {
 
 var color = exports.color = function(type, str) {
   if (!exports.useColors) return str;
-  return '\033[' + exports.colors[type] + 'm' + str + '\033[0m';
+  return '\u001b[' + exports.colors[type] + 'm' + str + '\u001b[0m';
 };
 
 /**
@@ -1143,19 +1225,19 @@ exports.window = {
 
 exports.cursor = {
   hide: function(){
-    process.stdout.write('\033[?25l');
+    process.stdout.write('\u001b[?25l');
   },
 
   show: function(){
-    process.stdout.write('\033[?25h');
+    process.stdout.write('\u001b[?25h');
   },
 
   deleteLine: function(){
-    process.stdout.write('\033[2K');
+    process.stdout.write('\u001b[2K');
   },
 
   beginningOfLine: function(){
-    process.stdout.write('\033[0G');
+    process.stdout.write('\u001b[0G');
   },
 
   CR: function(){
@@ -1490,6 +1572,7 @@ function Dot(runner) {
   var self = this
     , stats = this.stats
     , width = Base.window.width * .75 | 0
+    , c = '․'
     , n = 0;
 
   runner.on('start', function(){
@@ -1497,21 +1580,21 @@ function Dot(runner) {
   });
 
   runner.on('pending', function(test){
-    process.stdout.write(color('pending', '.'));
+    process.stdout.write(color('pending', c));
   });
 
   runner.on('pass', function(test){
     if (++n % width == 0) process.stdout.write('\n  ');
     if ('slow' == test.speed) {
-      process.stdout.write(color('bright yellow', '.'));
+      process.stdout.write(color('bright yellow', c));
     } else {
-      process.stdout.write(color(test.speed, '.'));
+      process.stdout.write(color(test.speed, c));
     }
   });
 
   runner.on('fail', function(test, err){
     if (++n % width == 0) process.stdout.write('\n  ');
-    process.stdout.write(color('fail', '.'));
+    process.stdout.write(color('fail', c));
   });
 
   runner.on('end', function(){
@@ -1616,8 +1699,8 @@ exports = module.exports = HTML;
 
 var statsTemplate = '<ul id="stats">'
   + '<li class="progress"><canvas width="40" height="40"></canvas></li>'
-  + '<li class="passes">passes: <em>0</em></li>'
-  + '<li class="failures">failures: <em>0</em></li>'
+  + '<li class="passes"><a href="#">passes:</a> <em>0</em></li>'
+  + '<li class="failures"><a href="#">failures:</a> <em>0</em></li>'
   + '<li class="duration">duration: <em>0</em>s</li>'
   + '</ul>';
 
@@ -1638,7 +1721,9 @@ function HTML(runner) {
     , stat = fragment(statsTemplate)
     , items = stat.getElementsByTagName('li')
     , passes = items[1].getElementsByTagName('em')[0]
+    , passesLink = items[1].getElementsByTagName('a')[0]
     , failures = items[2].getElementsByTagName('em')[0]
+    , failuresLink = items[2].getElementsByTagName('a')[0]
     , duration = items[3].getElementsByTagName('em')[0]
     , canvas = stat.getElementsByTagName('canvas')[0]
     , report = fragment('<ul id="report"></ul>')
@@ -1653,6 +1738,18 @@ function HTML(runner) {
 
   if (!root) return error('#mocha div missing, add it to your document');
 
+  // pass toggle
+  on(passesLink, 'click', function () {
+    var className = /pass/.test(report.className) ? '' : ' pass';
+    report.className = report.className.replace(/fail|pass/g, '') + className;
+  });
+
+  // failure toggle
+  on(failuresLink, 'click', function () {
+    var className = /fail/.test(report.className) ? '' : ' fail';
+    report.className = report.className.replace(/fail|pass/g, '') + className;
+  });
+
   root.appendChild(stat);
   root.appendChild(report);
 
@@ -1663,7 +1760,7 @@ function HTML(runner) {
 
     // suite
     var url = location.protocol + '//' + location.host + location.pathname + '?grep=^' + utils.escapeRegexp(suite.fullTitle());
-    var el = fragment('<li class="suite"><h1><a href="%s">%s</a></h1></li>', url, suite.title);
+    var el = fragment('<li class="suite"><h1><a href="%s">%s</a></h1></li>', url, escape(suite.title));
 
     // container
     stack[0].appendChild(el);
@@ -1681,6 +1778,8 @@ function HTML(runner) {
   });
 
   runner.on('test end', function(test){
+    window.scrollTo(0, document.body.scrollHeight);
+
     // TODO: add to stats
     var percent = stats.tests / total * 100 | 0;
     if (progress) progress.update(percent).draw(ctx);
@@ -1718,17 +1817,16 @@ function HTML(runner) {
     }
 
     // toggle code
-    var h2 = el.getElementsByTagName('h2')[0];
-
-    on(h2, 'click', function(){
-      pre.style.display = 'none' == pre.style.display
-        ? 'block'
-        : 'none';
-    });
-
-    // code
     // TODO: defer
     if (!test.pending) {
+      var h2 = el.getElementsByTagName('h2')[0];
+
+      on(h2, 'click', function(){
+        pre.style.display = 'none' == pre.style.display
+          ? 'inline-block'
+          : 'none';
+      });
+
       var pre = fragment('<pre><code>%e</code></pre>', utils.clean(test.fn.toString()));
       el.appendChild(pre);
       pre.style.display = 'none';
@@ -1788,6 +1886,7 @@ function on(el, event, fn) {
     el.attachEvent('on' + event, fn);
   }
 }
+
 }); // module: reporters/html.js
 
 require.register("reporters/index.js", function(module, exports, require){
@@ -1801,13 +1900,14 @@ exports.HTML = require('./html');
 exports.List = require('./list');
 exports.Min = require('./min');
 exports.Spec = require('./spec');
+exports.Nyan = require('./nyan');
+exports.XUnit = require('./xunit');
 exports.Progress = require('./progress');
 exports.Landing = require('./landing');
 exports.JSONCov = require('./json-cov');
 exports.HTMLCov = require('./html-cov');
 exports.JSONStream = require('./json-stream');
-exports.XUnit = require('./xunit')
-exports.Teamcity = require('./teamcity')
+exports.Teamcity = require('./teamcity');
 
 }); // module: reporters/index.js
 
@@ -2177,14 +2277,14 @@ function Landing(runner) {
     }
 
     // render landing strip
-    stream.write('\033[4F\n\n');
+    stream.write('\u001b[4F\n\n');
     stream.write(runway());
     stream.write('\n  ');
     stream.write(color('runway', Array(col).join('⋅')));
     stream.write(plane)
     stream.write(color('runway', Array(width - col).join('⋅') + '\n'));
     stream.write(runway());
-    stream.write('\033[0m');
+    stream.write('\u001b[0m');
   });
 
   runner.on('end', function(){
@@ -2274,7 +2374,6 @@ List.prototype.constructor = List;
 }); // module: reporters/list.js
 
 require.register("reporters/markdown.js", function(module, exports, require){
-
 /**
  * Module dependencies.
  */
@@ -2356,7 +2455,7 @@ function Markdown(runner) {
   runner.on('pass', function(test){
     var code = utils.clean(test.fn.toString());
     buf += test.title + '.\n';
-    buf += '\n```js';
+    buf += '\n```js\n';
     buf += code + '\n';
     buf += '```\n\n';
   });
@@ -2370,6 +2469,7 @@ function Markdown(runner) {
 }); // module: reporters/markdown.js
 
 require.register("reporters/min.js", function(module, exports, require){
+
 /**
  * Module dependencies.
  */
@@ -2394,9 +2494,9 @@ function Min(runner) {
   
   runner.on('start', function(){
     // clear screen
-    process.stdout.write('\033[2J');
+    process.stdout.write('\u001b[2J');
     // set cursor position
-    process.stdout.write('\033[1;3H');
+    process.stdout.write('\u001b[1;3H');
   });
 
   runner.on('end', this.epilogue.bind(this));
@@ -2501,7 +2601,7 @@ NyanCat.prototype.drawScoreboard = function(){
 
   function draw(color, n) {
     write(' ');
-    write('\033[' + color + 'm' + n + '\033[0m');
+    write('\u001b[' + color + 'm' + n + '\u001b[0m');
     write('\n');
   }
 
@@ -2540,7 +2640,7 @@ NyanCat.prototype.drawRainbow = function(){
   var self = this;
 
   this.trajectories.forEach(function(line, index) {
-    write('\033[' + self.scoreboardWidth + 'C');
+    write('\u001b[' + self.scoreboardWidth + 'C');
     write(line.join(''));
     write('\n');
   });
@@ -2560,7 +2660,7 @@ NyanCat.prototype.drawNyanCat = function(status) {
   var startWidth = this.scoreboardWidth + this.trajectories[0].length;
 
   [0, 1, 2, 3].forEach(function(index) {
-    write('\033[' + startWidth + 'C');
+    write('\u001b[' + startWidth + 'C');
 
     switch (index) {
       case 0:
@@ -2569,7 +2669,7 @@ NyanCat.prototype.drawNyanCat = function(status) {
         break;
       case 1:
         var padding = self.tick ? '  ' : '   ';
-        write('_|' + padding + '/\\_/\\');
+        write('_|' + padding + '/\\_/\\ ');
         write('\n');
         break;
       case 2:
@@ -2586,12 +2686,12 @@ NyanCat.prototype.drawNyanCat = function(status) {
           default:
             face = '( - .-)';
         }
-        write(tail + '|' + padding + face);
+        write(tail + '|' + padding + face + ' ');
         write('\n');
         break;
       case 3:
         var padding = self.tick ? ' ' : '  ';
-        write(padding + '""  ""');
+        write(padding + '""  "" ');
         write('\n');
         break;
     }
@@ -2608,7 +2708,7 @@ NyanCat.prototype.drawNyanCat = function(status) {
  */
 
 NyanCat.prototype.cursorUp = function(n) {
-  write('\033[' + n + 'A');
+  write('\u001b[' + n + 'A');
 };
 
 /**
@@ -2619,7 +2719,7 @@ NyanCat.prototype.cursorUp = function(n) {
  */
 
 NyanCat.prototype.cursorDown = function(n) {
-  write('\033[' + n + 'B');
+  write('\u001b[' + n + 'B');
 };
 
 /**
@@ -2655,7 +2755,7 @@ NyanCat.prototype.generateColors = function(){
 NyanCat.prototype.rainbowify = function(str){
   var color = this.rainbowColors[this.colorIndex % this.rainbowColors.length];
   this.colorIndex += 1;
-  return '\033[38;5;' + color + 'm' + str + '\033[0m';
+  return '\u001b[38;5;' + color + 'm' + str + '\u001b[0m';
 };
 
 /**
@@ -2739,7 +2839,7 @@ function Progress(runner, options) {
       , i = width - n;
 
     cursor.CR();
-    process.stdout.write('\033[J');
+    process.stdout.write('\u001b[J');
     process.stdout.write(color('progress', '  ' + options.open));
     process.stdout.write(Array(n).join(options.complete));
     process.stdout.write(Array(i).join(options.incomplete));
@@ -3036,7 +3136,11 @@ function XUnit(runner) {
     , tests = []
     , self = this;
 
-  runner.on('test end', function(test){
+  runner.on('pass', function(test){
+    tests.push(test);
+  });
+  
+  runner.on('fail', function(test){
     tests.push(test);
   });
 
@@ -3121,7 +3225,7 @@ require.register("runnable.js", function(module, exports, require){
  */
 
 var EventEmitter = require('browser/events').EventEmitter
-  , debug = require('browser/debug')('runnable');
+  , debug = require('browser/debug')('mocha:runnable');
 
 /**
  * Save timer references to avoid Sinon interfering (see GH-237).
@@ -3203,6 +3307,22 @@ Runnable.prototype.clearTimeout = function(){
 };
 
 /**
+ * Inspect the runnable void of private properties.
+ *
+ * @return {String}
+ * @api private
+ */
+
+Runnable.prototype.inspect = function(){
+  return JSON.stringify(this, function(key, val){
+    if ('_' == key[0]) return;
+    if ('parent' == key) return '#<Suite>';
+    if ('ctx' == key) return '#<Context>';
+    return val;
+  }, 2);
+};
+
+/**
  * Reset the timeout.
  *
  * @api private
@@ -3249,16 +3369,16 @@ Runnable.prototype.run = function(fn){
   }
 
   // called multiple times
-  function multiple() {
+  function multiple(err) {
     if (emitted) return;
     emitted = true;
-    self.emit('error', new Error('done() called multiple times'));
+    self.emit('error', err || new Error('done() called multiple times'));
   }
 
   // finished
   function done(err) {
     if (self.timedOut) return;
-    if (finished) return multiple();
+    if (finished) return multiple(err);
     self.clearTimeout();
     self.duration = new Date - start;
     finished = true;
@@ -3301,7 +3421,7 @@ require.register("runner.js", function(module, exports, require){
  */
 
 var EventEmitter = require('browser/events').EventEmitter
-  , debug = require('browser/debug')('runner')
+  , debug = require('browser/debug')('mocha:runner')
   , Test = require('./test')
   , utils = require('./utils')
   , filter = utils.filter
@@ -3358,13 +3478,15 @@ Runner.prototype.constructor = Runner;
  * with number of tests matched.
  *
  * @param {RegExp} re
+ * @param {Boolean} invert
  * @return {Runner} for chaining
  * @api public
  */
 
-Runner.prototype.grep = function(re){
+Runner.prototype.grep = function(re, invert){
   debug('grep %s', re);
   this._grep = re;
+  this._invert = invert;
   this.total = this.grepTotal(this.suite);
   return this;
 };
@@ -3383,7 +3505,9 @@ Runner.prototype.grepTotal = function(suite) {
   var total = 0;
 
   suite.eachTest(function(test){
-    if (self._grep.test(test.fullTitle())) total++;
+    var match = self._grep.test(test.fullTitle());
+    if (self._invert) match = !match;
+    if (match) total++;
   });
 
   return total;
@@ -3488,6 +3612,8 @@ Runner.prototype.hook = function(name, fn){
 
     hook.run(function(err){
       hook.removeAllListeners('error');
+      var testError = hook.error();
+      if (testError) self.fail(self.test, testError);
       if (err) return self.failHook(hook, err);
       self.emit('hook end', hook);
       next(++i);
@@ -3621,7 +3747,9 @@ Runner.prototype.runTests = function(suite, fn){
     if (!test) return fn();
 
     // grep
-    if (!self._grep.test(test.fullTitle())) return next();
+    var match = self._grep.test(test.fullTitle());
+    if (self._invert) match = !match;
+    if (!match) return next();
 
     // pending
     if (test.pending) {
@@ -3702,9 +3830,9 @@ Runner.prototype.runSuite = function(suite, fn){
  */
 
 Runner.prototype.uncaught = function(err){
-  debug('uncaught exception');
+  debug('uncaught exception %s', err.message);
   var runnable = this.currentRunnable;
-  if ('failed' == runnable.state) return;
+  if (!runnable || 'failed' == runnable.state) return;
   runnable.clearTimeout();
   err.uncaught = true;
   this.fail(runnable, err);
@@ -3771,7 +3899,8 @@ Runner.prototype.run = function(fn){
 function filterLeaks(ok) {
   return filter(keys(global), function(key){
     var matched = filter(ok, function(ok){
-      return 0 == key.indexOf(ok.split('*')[0]);
+      if (~ok.indexOf('*')) return 0 == key.indexOf(ok.split('*')[0]);
+      return key == ok;
     });
     return matched.length == 0 && (!global.navigator || 'onerror' !== key);
   });
@@ -3785,7 +3914,7 @@ require.register("suite.js", function(module, exports, require){
  */
 
 var EventEmitter = require('browser/events').EventEmitter
-  , debug = require('browser/debug')('suite')
+  , debug = require('browser/debug')('mocha:suite')
   , utils = require('./utils')
   , Hook = require('./hook');
 
@@ -3811,6 +3940,7 @@ exports = module.exports = Suite;
 exports.create = function(parent, title){
   var suite = new Suite(title, parent.ctx);
   suite.parent = parent;
+  if (parent.pending) suite.pending = true;
   title = suite.fullTitle();
   parent.addSuite(suite);
   return suite;
@@ -3830,6 +3960,7 @@ function Suite(title, ctx) {
   this.ctx = ctx;
   this.suites = [];
   this.tests = [];
+  this.pending = false;
   this._beforeEach = [];
   this._beforeAll = [];
   this._afterEach = [];
@@ -3903,6 +4034,7 @@ Suite.prototype.bail = function(bail){
  */
 
 Suite.prototype.beforeAll = function(fn){
+  if (this.pending) return this;
   var hook = new Hook('"before all" hook', fn);
   hook.parent = this;
   hook.timeout(this.timeout());
@@ -3921,6 +4053,7 @@ Suite.prototype.beforeAll = function(fn){
  */
 
 Suite.prototype.afterAll = function(fn){
+  if (this.pending) return this;
   var hook = new Hook('"after all" hook', fn);
   hook.parent = this;
   hook.timeout(this.timeout());
@@ -3939,6 +4072,7 @@ Suite.prototype.afterAll = function(fn){
  */
 
 Suite.prototype.beforeEach = function(fn){
+  if (this.pending) return this;
   var hook = new Hook('"before each" hook', fn);
   hook.parent = this;
   hook.timeout(this.timeout());
@@ -3957,6 +4091,7 @@ Suite.prototype.beforeEach = function(fn){
  */
 
 Suite.prototype.afterEach = function(fn){
+  if (this.pending) return this;
   var hook = new Hook('"after each" hook', fn);
   hook.parent = this;
   hook.timeout(this.timeout());
@@ -4085,22 +4220,6 @@ Test.prototype = new Runnable;
 Test.prototype.constructor = Test;
 
 
-/**
- * Inspect the context void of private properties.
- *
- * @return {String}
- * @api private
- */
-
-Test.prototype.inspect = function(){
-  return JSON.stringify(this, function(key, val){
-    return '_' == key[0]
-      ? undefined
-      : 'parent' == key
-        ? '#<Suite>'
-        : val;
-  }, 2);
-};
 }); // module: test.js
 
 require.register("utils.js", function(module, exports, require){
@@ -4112,7 +4231,7 @@ require.register("utils.js", function(module, exports, require){
 var fs = require('browser/fs')
   , path = require('browser/path')
   , join = path.join
-  , debug = require('browser/debug')('watch');
+  , debug = require('browser/debug')('mocha:watch');
 
 /**
  * Ignored directories.
@@ -4395,9 +4514,10 @@ window.mocha = require('mocha');
 
 // boot
 ;(function(){
-  var suite = new mocha.Suite('', new mocha.Context)
-    , utils = mocha.utils
+  var utils = mocha.utils
     , options = {}
+
+  mocha.suite = new mocha.Suite('', new mocha.Context());
 
   /**
    * Highlight the given string of `js`.
@@ -4451,9 +4571,9 @@ window.mocha = require('mocha');
 
     ui = mocha.interfaces[options.ui];
     if (!ui) throw new Error('invalid mocha interface "' + ui + '"');
-    if (options.timeout) suite.timeout(options.timeout);
-    ui(suite);
-    suite.emit('pre-require', window);
+    if (options.timeout) mocha.suite.timeout(options.timeout);
+    ui(mocha.suite);
+    mocha.suite.emit('pre-require', window);
   };
 
   /**
@@ -4461,8 +4581,8 @@ window.mocha = require('mocha');
    */
 
   mocha.run = function(fn){
-    suite.emit('run');
-    var runner = new mocha.Runner(suite);
+    mocha.suite.emit('run');
+    var runner = new mocha.Runner(mocha.suite);
     var Reporter = options.reporter || mocha.reporters.HTML;
     var reporter = new Reporter(runner);
     var query = parse(window.location.search || "");
