@@ -7,5 +7,5 @@ describe 'Header', ->
   afterEach ->
     @model.dispose()
 
-  it 'should contain 3 items', ->
-    expect(@model.get 'items').to.have.length 3
+  it 'should contain 4 items', ->
+    expect(@model.get 'items').to.have.length 4
