@@ -8,7 +8,7 @@
   <script src="../javascripts/app.js"></script>
   <script src="javascripts/test-vendor.js"></script>
   <script>
-    mocha.setup('bdd');
+    mocha.setup({ui: 'bdd', globals: ['script*']});
     window.expect = chai.expect;
   </script>
   <script src="javascripts/test.js"></script>
