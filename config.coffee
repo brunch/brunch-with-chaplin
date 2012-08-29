@@ -22,7 +22,7 @@ exports.config =
         'stylesheets/app.css': /^(app|vendor)/
         'test/stylesheets/test.css': /^test/
       order:
-        before: ['vendor/styles/normalize-1.0.0.css']
+        before: ['vendor/styles/normalize-1.0.1.css']
         after: ['vendor/styles/helpers.css']
 
     templates:

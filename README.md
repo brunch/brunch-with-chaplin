@@ -30,7 +30,7 @@ except a few changes:
 * CommonJS is used instead of AMD, because it's easier to use & debug.
 
 ## Features
-* HTML5Boilerplate 3.0.3 html & css are included.
+* HTML5Boilerplate 4.0.0 html & css are included.
 * CoffeeScript + Stylus + Handlebars as app languages
 (you can change this to anything you want)
 * Backbone as main framework
