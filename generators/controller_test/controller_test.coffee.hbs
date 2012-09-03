@@ -1,5 +1,5 @@
-{{#camelize}}{{name}}{{/camelize}} = require 'models/{{name}}'
+{{#camelize}}{{name}}{{/camelize}} = require 'controllers/{{name}}'
 
 describe '{{#camelize}}{{name}}{{/camelize}}', ->
   beforeEach ->
-    @model = new {{#camelize}}{{name}}{{/camelize}}()
+    @controller = new {{#camelize}}{{name}}{{/camelize}}()
