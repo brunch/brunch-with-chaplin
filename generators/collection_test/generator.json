@@ -2,7 +2,7 @@
   "files": [
     {
       "from": "collection_test.coffee.hbs",
-      "to": "test/models/{{name}}_test.coffee"
+      "to": "test/models/{{pluralName}}_test.coffee"
     }
   ],
   "dependencies": []
