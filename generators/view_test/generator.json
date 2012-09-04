@@ -2,7 +2,7 @@
   "files": [
     {
       "from": "view_test.coffee.hbs",
-      "to": "test/views/{{name}}_view.coffee"
+      "to": "test/views/{{name}}_view_test.coffee"
     }
   ],
   "dependencies": []
