@@ -541,7 +541,7 @@ require.define 'chaplin/models/model': (exports, require, module) ->
         modelStack.push model
       # Map model/collection to their attributes
       for key, value of attributes
-        if value instanceof Model
+        if value instanceof Backbone.Model
           # Don’t change the original attribute, create a property
           # on the delegator which shadows the original attribute
           delegator ?= utils.beget attributes
@@ -1009,7 +1009,7 @@ require.define 'chaplin/views/view': (exports, require, module) ->
       modelOrCollection.off type, handler
 
     # Unbind all recorded model event handlers
-    modelUnbindAll: () ->
+    modelUnbindAll: ->
       # Get model/collection reference
       modelOrCollection = @model or @collection
       return unless modelOrCollection
@@ -1222,7 +1222,7 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
 
     # By default, fading in is done by javascript function which can be
     # slow on mobile devices. CSS animations are faster,
-    # but require user's manual definitions.
+    # but require user’s manual definitions.
     # CSS classes used are: animated-item-view, animated-item-view-end.
     useCssAnimation: false
 
@@ -1345,7 +1345,7 @@ defined (or the getView() must be overridden)'
     render: ->
       super
 
-      # Set the $list property
+      # Set the $list property with the actual list container
       @$list = if @listSelector then @$(@listSelector) else @$el
 
       @initFallback()
@@ -1410,10 +1410,18 @@ defined (or the getView() must be overridden)'
 
     # Applies a filter to the collection view.
     # Expects an iterator function as parameter.
-    # Hides all items for which the iterator returns false.
-    filter: (filterer) ->
+    # If no callback, hides all items for which the iterator returns false.
+    filter: (filterer, callback) ->
       # Save the new filterer function
       @filterer = filterer
+
+      # Default callback (hides excluded items)
+      callback ?= (view, included) =>
+        display = if included then '' else 'none'
+        view.$el.stop(true, true).css('display', display)
+        # Update visibleItems list, but do not trigger
+        # a `visibilityChange` event immediately
+        @updateVisibleItems view.model, included, false
 
       # Show/hide existing views
       unless _(@viewsByCid).isEmpty()
@@ -1421,9 +1429,9 @@ defined (or the getView() must be overridden)'
 
           # Apply filter to the item
           included = if typeof filterer is 'function'
-              filterer item, index
-            else
-              true
+            filterer item, index
+          else
+            true
 
           # Show/hide the view accordingly
           view = @viewsByCid[item.cid]
@@ -1432,13 +1440,8 @@ defined (or the getView() must be overridden)'
             throw new Error 'CollectionView#filter: ' +
               "no view found for #{item.cid}"
 
-          view.$el
-            .stop(true, true)
-            .css('display', if included then '' else 'none')
-
-          # Update visibleItems list, but do not trigger
-          # a `visibilityChange` event immediately
-          @updateVisibleItems item, included, false
+          # Apply callback
+          callback view, included
 
       # Trigger a combined `visibilityChange` event
       @trigger 'visibilityChange', @visibleItems
@@ -1488,7 +1491,7 @@ defined (or the getView() must be overridden)'
       view = @renderItem item
       @insertView item, view, index
 
-    # Instantiate and render an item using the viewsByCid hash as a cache
+    # Instantiate and render an item using the `viewsByCid` hash as a cache
     renderItem: (item) ->
       # Get the existing view
       view = @viewsByCid[item.cid]
@@ -1514,9 +1517,9 @@ defined (or the getView() must be overridden)'
 
       # Is the item included in the filter?
       included = if typeof @filterer is 'function'
-          @filterer item, position
-        else
-          true
+        @filterer item, position
+      else
+        true
 
       # Get the view’s top element
       viewEl = view.el
@@ -1537,20 +1540,25 @@ defined (or the getView() must be overridden)'
       $list = @$list
 
       # Get the children which originate from item views
-      children = $list.children (@itemSelector or undefined)
-      length = children.length
-
-      if length is 0 or position is length
-        # Insert at the end
-        $list.append viewEl
+      children = if @itemSelector
+        $list.children @itemSelector
       else
-        # Insert at the right position
-        if position is 0
-          $next = children.eq position
-          $next.before viewEl
+        $list.children()
+
+      # Check if it needs to be inserted
+      unless children.get(position) is viewEl
+        length = children.length
+        if length is 0 or position is length
+          # Insert at the end
+          $list.append viewEl
         else
-          $previous = children.eq position - 1
-          $previous.after viewEl
+          # Insert at the right position
+          if position is 0
+            $next = children.eq position
+            $next.before viewEl
+          else
+            $previous = children.eq position - 1
+            $previous.after viewEl
 
       # Tell the view that it was added to the DOM
       view.trigger 'addedToDOM'
@@ -1676,7 +1684,7 @@ require.define 'chaplin/lib/route': (exports, require, module) ->
         # Escape magic characters
         .replace(escapeRegExp, '\\$&')
         # Replace named parameters, collecting their names
-        .replace(/:(\w+)/g, @addParamName)
+        .replace(/(?::|\*)(\w+)/g, @addParamName)
 
       # Create the actual regular expression
       # Match until the end of the URL or the begin of query string
@@ -1690,7 +1698,12 @@ require.define 'chaplin/lib/route': (exports, require, module) ->
       # Save parameter name
       @paramNames.push paramName
       # Replace with a character class
-      '([^\/\?]+)'
+      if match.charAt(0) is ':'
+        # Regexp for :foo
+        '([^\/\?]+)'
+      else
+        # Regexp for *foo
+        '(.*?)'
 
     # Test if the route matches to a path (called by Backbone.History#loadUrl)
     test: (path) ->
@@ -1840,6 +1853,7 @@ require.define 'chaplin/lib/router': (exports, require, module) ->
       # Since we want routes to match in the order they were specified,
       # we’re appending the route at the end.
       Backbone.history.handlers.push {route, callback: route.handler}
+      route
 
     # Route a given URL path manually, returns whether a route matched
     # This looks quite like Backbone.History::loadUrl but it
