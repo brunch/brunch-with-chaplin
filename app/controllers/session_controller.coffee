@@ -69,11 +69,11 @@ module.exports = class SessionController extends Controller
 
     # Publish an event in case the provider library could not be loaded
     unless serviceProvider.isLoaded()
-      mediator.publish 'serviceProviderMissing', serviceProviderName
+      @publishEvent 'serviceProviderMissing', serviceProviderName
       return
 
     # Publish a global loginAttempt event
-    mediator.publish 'loginAttempt', serviceProviderName
+    @publishEvent 'loginAttempt', serviceProviderName
 
     # Delegate to service provider
     serviceProvider.triggerLogin()
@@ -98,8 +98,8 @@ module.exports = class SessionController extends Controller
     @loginStatusDetermined = true
 
     # Publish a global login event passing the user
-    mediator.publish 'login', mediator.user
-    mediator.publish 'loginStatus', true
+    @publishEvent 'login', mediator.user
+    @publishEvent 'loginStatus', true
 
   # Logout
   # ------
@@ -107,7 +107,7 @@ module.exports = class SessionController extends Controller
   # Handler for the global !logout event
   triggerLogout: ->
     # Just publish a logout event for now
-    mediator.publish 'logout'
+    @publishEvent 'logout'
 
   # Handler for the global logout event
   logout: =>
@@ -121,7 +121,7 @@ module.exports = class SessionController extends Controller
     # Show the login view again
     @showLoginView()
 
-    mediator.publish 'loginStatus', false
+    @publishEvent 'loginStatus', false
 
   # Handler for the global userData event
   # -------------------------------------

@@ -1,4 +1,3 @@
-mediator = require 'mediator'
 utils = require 'lib/utils'
 View = require 'views/base/view'
 template = require 'views/templates/login'
@@ -18,7 +17,6 @@ module.exports = class LoginView extends View
   # one button. But this should allow for different service providers.
   initButtons: (serviceProviders) ->
     for serviceProviderName, serviceProvider of serviceProviders
-
       buttonSelector = ".#{serviceProviderName}"
       @$(buttonSelector).addClass('service-loading')
 
@@ -37,11 +35,11 @@ module.exports = class LoginView extends View
       )
       serviceProvider.fail failed
 
-  loginWith: (serviceProviderName, serviceProvider, e) ->
-    e.preventDefault()
+  loginWith: (serviceProviderName, serviceProvider, event) ->
+    event.preventDefault()
     return unless serviceProvider.isLoaded()
-    mediator.publish 'login:pickService', serviceProviderName
-    mediator.publish '!login', serviceProviderName
+    @publishEvent 'login:pickService', serviceProviderName
+    @publishEvent '!login', serviceProviderName
 
   serviceProviderLoaded: (serviceProviderName) ->
     @$(".#{serviceProviderName}").removeClass('service-loading')
