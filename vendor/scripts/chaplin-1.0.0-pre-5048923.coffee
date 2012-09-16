@@ -392,7 +392,6 @@ require.define 'chaplin/models/collection': (exports, require, module) ->
   _ = require 'underscore'
   Backbone = require 'backbone'
   EventBroker = require 'chaplin/lib/event_broker'
-  SyncMachine = require 'chaplin/lib/sync_machine'
   Model = require 'chaplin/models/model'
 
   # Abstract class which extends the standard Backbone collection
@@ -408,10 +407,6 @@ require.define 'chaplin/models/collection': (exports, require, module) ->
     # Mixin a Deferred
     initDeferred: ->
       _(this).extend $.Deferred()
-
-    # Mixin a synchronization state machine
-    initSyncMachine: ->
-      _(this).extend SyncMachine
 
     # Adds a collection atomically, i.e. throws no event until
     # all members have been added
@@ -506,7 +501,6 @@ require.define 'chaplin/models/model': (exports, require, module) ->
   Backbone = require 'backbone'
   utils = require 'chaplin/lib/utils'
   EventBroker = require 'chaplin/lib/event_broker'
-  SyncMachine = require 'chaplin/lib/sync_machine'
 
   module.exports = class Model extends Backbone.Model
 
@@ -516,10 +510,6 @@ require.define 'chaplin/models/model': (exports, require, module) ->
     # Mixin a Deferred
     initDeferred: ->
       _(this).extend $.Deferred()
-
-    # Mixin a synchronization state machine
-    initSyncMachine: ->
-      _(this).extend SyncMachine
 
     # This method is used to get the attributes for the view template
     # and might be overwritten by decorators which cannot create a
