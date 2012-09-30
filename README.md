@@ -34,7 +34,7 @@ except a few changes:
 * CoffeeScript + Stylus + Handlebars as app languages
 (you can change this to anything you want)
 * Backbone as main framework
-* Supports IE6 and up.
+* Supports IE8 and up.
 * Cross-module communication using the Mediator and Publish/Subscribe patterns
 * Controllers for managing individual UI views
 * Rails-style routes which map URLs to controller actions
