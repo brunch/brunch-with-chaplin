@@ -5,5 +5,7 @@
       "to": "app/views/{{name}}.coffee"
     }
   ],
-  "dependencies": []
+  "dependencies": [
+    {"name": "view_test", "params": "{{name}}"}
+  ]
 }
