@@ -35,5 +35,5 @@ Handlebars.registerHelper 'without', (context, options) ->
 
 # Evaluate block with context being current user
 Handlebars.registerHelper 'with_user', (options) ->
-  context = mediator.user or {}
+  context = mediator.user?.serialize() or {}
   Handlebars.helpers.with.call(this, context, options)

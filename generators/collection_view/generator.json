@@ -2,8 +2,10 @@
   "files": [
     {
       "from": "collection_view.coffee.hbs",
-      "to": "app/views/{{name}}.coffee"
+      "to": "app/views/{{name}}_view.coffee"
     }
   ],
-  "dependencies": []
+  "dependencies": [
+    {"name": "view_test", "params": "{{name}}"}
+  ]
 }
