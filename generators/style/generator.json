@@ -1,7 +1,7 @@
 {
   "files": [
     {
-      "from": "file.styl.hbs",
+      "from": "style.styl.hbs",
       "to": "app/views/styles/{{name}}.styl"
     }
   ],
