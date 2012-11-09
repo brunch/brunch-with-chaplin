@@ -13,7 +13,7 @@ exports.config =
         before: [
           'vendor/scripts/console-helper.js',
           'vendor/scripts/jquery-1.8.2.js',
-          'vendor/scripts/underscore-1.4.0.js',
+          'vendor/scripts/underscore-1.4.2.js',
           'vendor/scripts/backbone-0.9.2.js'
         ]
 
@@ -22,7 +22,7 @@ exports.config =
         'stylesheets/app.css': /^(app|vendor)/
         'test/stylesheets/test.css': /^test/
       order:
-        before: ['vendor/styles/normalize-1.0.1.css']
+        before: ['vendor/styles/normalize-2.0.1.css']
         after: ['vendor/styles/helpers.css']
 
     templates:
