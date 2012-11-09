@@ -26,15 +26,14 @@ is a official boilerplate all for chaplin. This skeleton is almost the same,
 except a few changes:
 
 * Added Header.
-* Added authentication abstractions (`SessionController`, `LoginView` etc).
 * CommonJS is used instead of AMD, because it's easier to use & debug.
 
 ## Features
-* HTML5Boilerplate 4.0.0 html & css are included.
+* HTML5Boilerplate html & css are included.
 * CoffeeScript + Stylus + Handlebars as app languages
 (you can change this to anything you want)
-* Backbone as main framework
-* Supports IE8 and up.
+* Backbone as main MVC/MVP library, Chaplin as meta-framework.
+* Support of IE8 and up.
 * Cross-module communication using the Mediator and Publish/Subscribe patterns
 * Controllers for managing individual UI views
 * Rails-style routes which map URLs to controller actions
@@ -44,8 +43,9 @@ enforce conventions
 * Strict memory management and object disposal
 * A collection with additional manipulation methods for smarter change events
 * A collection view for easy and intelligent list rendering
-* Client-side authentication using service providers like Facebook, Google
-and Twitter
+
+## Authentication
+If you build an application with authentication, there are some useful abstractions for it out there: https://github.com/chaplinjs/service-providers.
 
 ## License
 The MIT license.
