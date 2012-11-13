@@ -1,8 +1,8 @@
 Chaplin = require 'chaplin'
-mediator = require 'mediator'
-routes = require 'routes'
 HeaderController = require 'controllers/header_controller'
 Layout = require 'views/layout'
+mediator = require 'mediator'
+routes = require 'routes'
 
 # The application object
 module.exports = class Application extends Chaplin.Application
