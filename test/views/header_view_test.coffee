@@ -1,6 +1,5 @@
-mediator = require 'mediator'
-Header = require 'models/header'
 HeaderView = require 'views/header_view'
+mediator = require 'mediator'
 
 class HeaderViewTest extends HeaderView
   renderTimes: 0
@@ -11,12 +10,10 @@ class HeaderViewTest extends HeaderView
 
 describe 'HeaderView', ->
   beforeEach ->
-    @model = new Header()
-    @view = new HeaderViewTest({@model})
+    @view = new HeaderViewTest()
 
   afterEach ->
     @view.dispose()
-    @model.dispose()
 
   it 'should display 4 links', ->
     expect(@view.$el.find 'a').to.have.length 4
