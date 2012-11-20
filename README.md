@@ -45,7 +45,7 @@ enforce conventions
 * A collection view for easy and intelligent list rendering
 
 ## Authentication
-If you build an application with authentication, there are some useful abstractions for it out there: https://github.com/chaplinjs/service-providers.
+If you build an application with authentication, there are some useful abstractions for it out there: https://github.com/chaplinjs/chaplin-auth.
 
 ## License
 The MIT license.
