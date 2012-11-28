@@ -6,6 +6,6 @@
     }
   ],
   "dependencies": [
-    {"name": "collection_test", "params": "{{name}}"}
+    {"name": "collection-test", "params": "{{name}}"}
   ]
 }
