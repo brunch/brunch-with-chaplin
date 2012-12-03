@@ -1,4 +1,4 @@
-HeaderView = require 'views/header_view'
+HeaderView = require 'views/header-view'
 mediator = require 'mediator'
 
 class HeaderViewTest extends HeaderView
@@ -10,7 +10,7 @@ class HeaderViewTest extends HeaderView
 
 describe 'HeaderView', ->
   beforeEach ->
-    @view = new HeaderViewTest()
+    @view = new HeaderViewTest
 
   afterEach ->
     @view.dispose()
