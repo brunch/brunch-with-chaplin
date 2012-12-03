@@ -7,16 +7,8 @@
   <script src="../javascripts/vendor.js"></script>
   <script src="../javascripts/app.js"></script>
   <script src="javascripts/test-vendor.js"></script>
-  <script>
-    mocha.setup({ui: 'bdd', globals: ['script*']});
-    window.expect = chai.expect;
-  </script>
   <script src="javascripts/test.js"></script>
-  <script>
-    $(function() {
-      mocha.run();
-    });
-  </script>
+  <script>$(function() {mocha.run()});</script>
 </head>
 <body>
   <div id="mocha"></div>
