@@ -1,9 +1,9 @@
 ###
-Chaplin 0.5.0.
+Chaplin 0.6.0.
 
 Chaplin may be freely distributed under the MIT license.
 For all details and documentation:
-http://github.com/chaplinjs/chaplin
+http://chaplinjs.org
 ###
 
 'use strict'
@@ -114,15 +114,11 @@ require.define 'chaplin/mediator': (exports, require, module) ->
   mediator.unsubscribe = Backbone.Events.off
   mediator.publish     = Backbone.Events.trigger
 
-  # The `on` method should not be used,
-  # it is kept only for purpose of compatibility with Backbone.
-  mediator.on = mediator.subscribe
-
   # Initialize an empty callback list so we might seal the mediator later
   mediator._callbacks = null
 
   # Make properties readonly
-  utils.readonly mediator, 'subscribe', 'unsubscribe', 'publish', 'on'
+  utils.readonly mediator, 'subscribe', 'unsubscribe', 'publish'
 
   # Sealing the mediator
   # --------------------
@@ -177,18 +173,15 @@ require.define 'chaplin/dispatcher': (exports, require, module) ->
 
       # Listen to global events
       @subscribeEvent 'matchRoute', @matchRoute
-      @subscribeEvent '!startupController', @startupController
 
     # Controller management
     # Starting and disposing controllers
     # ----------------------------------
 
     # Handler for the global matchRoute event
-    matchRoute: (route, params) ->
-      @startupController route.controller, route.action, params
+    matchRoute: (route, params, options) ->
+      @startupController route.controller, route.action, params, options
 
-    # Handler for the global !startupController event
-    #
     # The standard flow is:
     #
     #   1. Test if it’s a new controller/action with new params
@@ -197,23 +190,24 @@ require.define 'chaplin/dispatcher': (exports, require, module) ->
     #   3. Instantiate the new controller, call the controller action
     #   4. Show the new view
     #
-    startupController: (controllerName, action = 'index', params = {}) ->
+    startupController: (controllerName, action = 'index', params = {},
+                        options = {}) ->
       # Set default flags
 
       # Whether to update the URL after controller startup
       # Default to true unless explicitly set to false
-      if params.changeURL isnt false
-        params.changeURL = true
+      if options.changeURL isnt false
+        options.changeURL = true
 
       # Whether to force the controller startup even
       # when current and new controllers and params match
       # Default to false unless explicitly set to true
-      if params.forceStartup isnt true
-        params.forceStartup = false
+      if options.forceStartup isnt true
+        options.forceStartup = false
 
       # Check if the desired controller is already active
       isSameController =
-        not params.forceStartup and
+        not options.forceStartup and
         @currentControllerName is controllerName and
         @currentAction is action and
         # Deep parameters check is not nice but the simplest way for now
@@ -223,7 +217,9 @@ require.define 'chaplin/dispatcher': (exports, require, module) ->
       return if isSameController
 
       # Fetch the new controller, then go on
-      handler = _(@controllerLoaded).bind(this, controllerName, action, params)
+      handler = _(@controllerLoaded).bind(
+        this, controllerName, action, params, options)
+
       @loadController controllerName, handler
 
     # Load the constructor for a given controller name.
@@ -237,12 +233,27 @@ require.define 'chaplin/dispatcher': (exports, require, module) ->
       else
         handler require path
 
-    # Handler for the controller lazy-loading
-    controllerLoaded: (controllerName, action, params, ControllerConstructor) ->
-
+    controllerLoaded: (controllerName, action, params, options, ControllerConstructor) ->
       # Shortcuts for the old controller
       currentControllerName = @currentControllerName or null
-      currentController     = @currentController     or null
+      # Initialize the new controller
+      # Passing the params and the old controller name
+      controller = new ControllerConstructor params, currentControllerName
+
+      method = if controller.beforeAction
+        'executeBeforeActionChain'
+      else
+        'executeAction'
+
+      this[method](controller, controllerName, action, params, options)
+
+    # Handler for the controller lazy-loading
+    executeAction: (controller, controllerName, action, params, options) ->
+      # Shortcuts for the old controller
+      currentControllerName   = @currentControllerName or null
+      currentController       = @currentController     or null
+
+      @previousControllerName = currentControllerName
 
       # Dispose the current controller
       if currentController
@@ -250,10 +261,6 @@ require.define 'chaplin/dispatcher': (exports, require, module) ->
         @publishEvent 'beforeControllerDispose', currentController
         # Passing the params and the new controller name
         currentController.dispose params, controllerName
-
-      # Initialize the new controller
-      # Passing the params and the old controller name
-      controller = new ControllerConstructor params, currentControllerName
 
       # Call the specific controller action
       # Passing the params and the old controller name
@@ -263,13 +270,13 @@ require.define 'chaplin/dispatcher': (exports, require, module) ->
       return if controller.redirected
 
       # Save the new controller
-      @previousControllerName = currentControllerName
       @currentControllerName = controllerName
       @currentController = controller
       @currentAction = action
       @currentParams = params
 
-      @adjustURL controller, params
+      # Adjust the URL; pass in both params and options
+      @adjustURL controller, params, options
 
       # We're done! Spread the word!
       @publishEvent 'startupController',
@@ -278,27 +285,63 @@ require.define 'chaplin/dispatcher': (exports, require, module) ->
         controllerName: @currentControllerName
         params: @currentParams
 
+    # Before actions with chained execution
+    executeBeforeActionChain: (controller, controllerName, action, params) ->
+      beforeActions  = []
+      args = arguments
+
+      # Before actions can be extended by subclasses, so we need to check the
+      # whole prototype chain for matching before actions. Before actions in
+      # parent classes are executed before actions in child classes.
+
+      prototypeChain = utils.getPrototypeChain controller
+      for prototype in prototypeChain.reverse()
+        acts = prototype.beforeAction
+        # Iterate over the before actions in search for a matching
+        # name with the arguments’ action name
+        for name, beforeAction of acts when beforeAction not in beforeActions
+          # Do not add this object more than once
+          if name is action or RegExp("^#{name}$").test(action)
+            if typeof beforeAction is 'string'
+              beforeAction = controller[beforeAction]
+            if typeof beforeAction isnt 'function'
+              throw new Error 'Controller#executeBeforeActionChain: ' +
+                "#{beforeAction} is not a valid beforeAction method for #{name}."
+            # Save the before action
+            beforeActions.push beforeAction
+
+      # Save returned value and also immediately return in case the value is false
+      next = (method, previous = null) =>
+        # Stop if the action triggered a redirect
+        if controller.redirected
+          # Adjust the URL; pass in params
+          return @adjustURL controller, params, {}
+
+        # End of chain, finally start the action
+        unless method
+          return @executeAction args...
+
+        previous = method.call controller, params, previous
+
+        # Detect a CommonJS promise  in order to use pipelining below,
+        # otherwise execute next method directly
+        if previous and typeof previous.then is 'function'
+          previous.then (data) ->
+            next beforeActions.shift(), data
+        else
+          next beforeActions.shift(), previous
+
+      # Start beforeAction execution chain
+      next beforeActions.shift()
+
     # Change the URL to the new controller using the router
-    adjustURL: (controller, params) ->
-      if params.path or params.path is ''
+    adjustURL: (controller, params, options) ->
+      if typeof options.path is 'string'
         # Just use the matched path
-        url = params.path
-
-      else if typeof controller.historyURL is 'function'
-        # Use controller.historyURL to get the URL
-        # If the property is a function, call it
-        url = controller.historyURL params
-
-      else if typeof controller.historyURL is 'string'
-        # If the property is a string, read it
-        url = controller.historyURL
-
-      else
-        throw new Error 'Dispatcher#adjustURL: controller for ' +
-          "#{@currentControllerName} does not provide a historyURL"
+        url = options.path
 
       # Tell the router to actually change the current URL
-      @publishEvent '!router:changeURL', url if params.changeURL
+      @publishEvent '!router:changeURL', url, options if options.changeURL
 
       # Save the URL
       @url = url
@@ -328,21 +371,18 @@ require.define 'chaplin/controllers/controller': (exports, require, module) ->
     # Borrow the static extend method from Backbone
     @extend = Backbone.Model.extend
 
-    # Mixin an EventBroker
+    # Mixin Backbone events and EventBroker.
+    _(@prototype).extend Backbone.Events
     _(@prototype).extend EventBroker
 
     view: null
-    currentId: null
 
     # Internal flag which stores whether `redirectTo`
     # was called in the current action
     redirected: false
 
-    # You should set a `title` property and a `historyURL` property or method
-    # on the derived controller. Like this:
+    # You should set a `title` property on the derived controller. Like this:
     # title: 'foo'
-    # historyURL: 'foo'
-    # historyURL: ->
 
     constructor: ->
       @initialize arguments...
@@ -350,19 +390,23 @@ require.define 'chaplin/controllers/controller': (exports, require, module) ->
     initialize: ->
       # Empty per default
 
+    adjustTitle: (subtitle) ->
+      @publishEvent '!adjustTitle', subtitle
+
     # Redirection
     # -----------
 
-    redirectTo: (arg1, action, params) ->
+    # Redirect to URL.
+    redirectTo: (url, params, options) ->
       @redirected = true
-      if arguments.length is 1
-        # URL was passed, try to route it
-        @publishEvent '!router:route', arg1, (routed) ->
-          unless routed
-            throw new Error 'Controller#redirectTo: no route matched'
-      else
-        # Assume controller and action names were passed
-        @publishEvent '!startupController', arg1, action, params
+      @publishEvent '!router:route', url, {}, (routed) ->
+        unless routed
+          throw new Error 'Controller#redirectTo: no route matched'
+
+    # Redirect to named route.
+    redirectToRoute: (name, params, options) ->
+      @redirected = true
+      @publishEvent '!router:routeByName', name, params, options
 
     # Disposal
     # --------
@@ -383,7 +427,7 @@ require.define 'chaplin/controllers/controller': (exports, require, module) ->
       @unsubscribeAllEvents()
 
       # Remove properties which are not disposable
-      properties = ['currentId', 'redirected']
+      properties = ['redirected']
       delete this[prop] for prop in properties
 
       # Finished
@@ -431,44 +475,6 @@ require.define 'chaplin/models/collection': (exports, require, module) ->
       while model = models[direction]()
         @add model, options
       @trigger 'reset'
-
-    # Updates a collection with a list of models
-    # Just like the reset method, but only adds new items and
-    # removes items which are not in the new list.
-    # Fires individual `add` and `remove` event instead of one `reset`.
-    #
-    # options:
-    #   deep: Boolean flag to specify whether existing models
-    #         should be updated with new values
-    update: (models, options = {}) ->
-      fingerPrint = @pluck('id').join()
-      ids = _(models).pluck('id')
-      newFingerPrint = ids.join()
-
-      # Only remove if ID fingerprints differ
-      if newFingerPrint isnt fingerPrint
-        # Remove items which are not in the new list
-        _ids = _(ids) # Underscore wrapper
-        i = @models.length
-        while i--
-          model = @models[i]
-          unless _ids.include model.id
-            @remove model
-
-      # Only add/update list if ID fingerprints differ
-      # or update is deep (member attributes)
-      if newFingerPrint isnt fingerPrint or options.deep
-        # Add items which are not yet in the list
-        for model, i in models
-          preexistent = @get model.id
-          if preexistent
-            # Update existing model
-            preexistent.set model if options.deep
-          else
-            # Insert new model
-            @add model, at: i
-
-      return
 
     # Disposal
     # --------
@@ -533,40 +539,54 @@ require.define 'chaplin/models/model': (exports, require, module) ->
 
     # Private helper function for serializing attributes recursively,
     # creating objects which delegate to the original attributes
-    # when a property needs to be overwritten.
+    # in order to protect them from changes.
     serializeAttributes = (model, attributes, modelStack) ->
-      # Create a delegator on initial call
-      unless modelStack
-        delegator = utils.beget attributes
-        modelStack = [model]
-      else
-        # Add model to stack
+      # Create a delegator object
+      delegator = utils.beget attributes
+
+      # Add model to stack
+      if modelStack
         modelStack.push model
-      # Map model/collection to their attributes
+      else
+        modelStack = [model]
+
+      # Map model/collection to their attributes. Create a property
+      # on the delegator that shadows the original attribute.
       for key, value of attributes
+
+        # Handle models
         if value instanceof Backbone.Model
-          # Don’t change the original attribute, create a property
-          # on the delegator which shadows the original attribute
-          delegator ?= utils.beget attributes
-          delegator[key] = if value is model or value in modelStack
-            # Nullify circular references
-            null
-          else
-            # Serialize recursively
-            serializeAttributes(
-              value, value.getAttributes(), modelStack
-            )
+          delegator[key] = serializeModelAttributes value, model, modelStack
+
+        # Handle collections
         else if value instanceof Backbone.Collection
-          delegator ?= utils.beget attributes
-          delegator[key] = for item in value.models
-            serializeAttributes(
-              item, item.getAttributes(), modelStack
+          serializedModels = []
+          for otherModel in value.models
+            serializedModels.push(
+              serializeModelAttributes(otherModel, model, modelStack)
             )
+          delegator[key] = serializedModels
 
       # Remove model from stack
       modelStack.pop()
-      # Return the delegator if it was created, otherwise the plain attributes
-      delegator or attributes
+
+      # Return the delegator
+      delegator
+
+    # Serialize the attributes of a given model
+    # in the context of a given tree
+    serializeModelAttributes = (model, currentModel, modelStack) ->
+      # Nullify circular references
+      if model is currentModel or model in modelStack
+        return null
+      # Serialize recursively
+      attributes = if typeof model.getAttributes is 'function'
+        # Chaplin models
+        model.getAttributes()
+      else
+        # Backbone models
+        model.attributes
+      serializeAttributes model, attributes, modelStack
 
     # Return an object which delegates to the attributes
     # (i.e. an object which has the attributes as prototype)
@@ -658,7 +678,7 @@ require.define 'chaplin/views/layout': (exports, require, module) ->
 
       @subscribeEvent 'beforeControllerDispose', @hideOldView
       @subscribeEvent 'startupController', @showNewView
-      @subscribeEvent 'startupController', @adjustTitle
+      @subscribeEvent '!adjustTitle', @adjustTitle
 
       # Set the app link routing
       if @settings.routeLinks
@@ -697,10 +717,8 @@ require.define 'chaplin/views/layout': (exports, require, module) ->
     # Handler for the global startupController event
     # Change the document title to match the new controller
     # Get the title from the title property of the current controller
-    adjustTitle: (context) ->
-      title = @title or ''
-      subtitle = context.controller.title or ''
-      title = @settings.titleTemplate {title, subtitle}
+    adjustTitle: (subtitle = '') ->
+      title = @settings.titleTemplate {@title, subtitle}
 
       # Internet Explorer < 9 workaround
       setTimeout (-> document.title = title), 50
@@ -768,7 +786,7 @@ require.define 'chaplin/views/layout': (exports, require, module) ->
         path = href
 
       # Pass to the router, try to route the path internally
-      @publishEvent '!router:route', path, (routed) ->
+      @publishEvent '!router:route', path, {}, (routed) ->
         # Prevent default handling if the URL could be routed
         if routed
           event.preventDefault()
@@ -840,62 +858,39 @@ require.define 'chaplin/views/view': (exports, require, module) ->
     subviews: null
     subviewsByName: null
 
-    # Method wrapping to enable `afterRender` and `afterInitialize`
-    # -------------------------------------------------------------
-
-    # Wrap a method in order to call the corresponding
-    # `after-` method automatically
-    wrapMethod: (name) ->
-      instance = this
-      # Enclose the original function
-      func = instance[name]
-      # Set a flag
-      instance["#{name}IsWrapped"] = true
-      # Create the wrapper method
-      instance[name] = ->
-        # Stop if the view was already disposed
-        return false if @disposed
-        # Call the original method
-        func.apply instance, arguments
-        # Call the corresponding `after-` method
-        instance["after#{utils.upcase(name)}"] arguments...
-        # Return the view
-        instance
-
-    constructor: ->
+    constructor: (options) ->
       # Wrap `initialize` so `afterInitialize` is called afterwards
-      # Only wrap if there is an overring method, otherwise we
+      # Only wrap if there is an overriding method, otherwise we
       # can call the `after-` method directly
       unless @initialize is View::initialize
-        @wrapMethod 'initialize'
+        utils.wrapMethod this, 'initialize'
 
       # Wrap `render` so `afterRender` is called afterwards
-      unless @render is View::render
-        @wrapMethod 'render'
-      else
-        # Otherwise just bind the `render` method
+      if @render is View::render
         @render = _(@render).bind this
+      else
+        utils.wrapMethod this, 'render'
+
+      # Copy some options to instance properties
+      if options
+        _(this).extend _.pick options, ['autoRender', 'container', 'containerMethod']
 
       # Call Backbone’s constructor
       super
 
+    # Inheriting classes must call `super` in their `initialize` method to
+    # properly inflate subviews and set up options
     initialize: (options) ->
       # No super call here, Backbone’s `initialize` is a no-op
-
-      # Copy some options to instance properties
-      if options
-        for prop in ['autoRender', 'container', 'containerMethod']
-          if options[prop]?
-            @[prop] = options[prop]
 
       # Initialize subviews
       @subviews = []
       @subviewsByName = {}
 
-      # Listen for disposal of the model
+      # Listen for disposal of the model or collection.
       # If the model is disposed, automatically dispose the associated view
-      if @model or @collection
-        @modelBind 'dispose', @dispose
+      @listenTo @model, 'dispose', @dispose if @model
+      @listenTo @collection, 'dispose', @dispose if @collection
 
       # Call `afterInitialize` if `initialize` was not wrapped
       unless @initializeIsWrapped
@@ -956,60 +951,44 @@ require.define 'chaplin/views/view': (exports, require, module) ->
       # Return the bound handler
       handler
 
-    # Remove all handlers registered with @delegate
+    # Copy of original backbone method without `undelegateEvents` call.
+    _delegateEvents: (events) ->
+      # Call Backbone.delegateEvents on all superclasses events.
+      return unless events or (events = getValue(this, 'events'))
+      for key of events
+        method = events[key]
+        method = this[method] unless _.isFunction(method)
+        unless method
+          throw new Error("Method '#{events[key]}' does not exist")
+        match = key.match(/^(\S+)\s*(.*)$/)
+        eventName = match[1]
+        selector = match[2]
+        method = _.bind(method, this)
+        eventName += ".delegateEvents#{@cid}"
+        if selector is ''
+          @$el.bind eventName, method
+        else
+          @$el.delegate selector, eventName, method
 
+    # Override Backbones method to combine the events
+    # of the parent view if it exists.
+    delegateEvents: ->
+      @undelegateEvents()
+
+      # Get 'events' props from every prototype,
+      # filter-out falsy values and duplicates.
+      _(utils.getPrototypeChain this)
+        .chain()
+        .pluck('events')
+        .compact()
+        .uniq()
+        .each (events) =>
+          @_delegateEvents events
+      return
+
+    # Remove all handlers registered with @delegate.
     undelegate: ->
       @$el.unbind ".delegate#{@cid}"
-
-    # Model binding
-    # The following implementation resembles EventBroker
-    # --------------------------------------------------
-
-    # Bind to a model event
-    modelBind: (type, handler) ->
-      if typeof type isnt 'string'
-        throw new TypeError 'View#modelBind: ' +
-          'type must be a string'
-      if typeof handler isnt 'function'
-        throw new TypeError 'View#modelBind: ' +
-          'handler argument must be function'
-
-      # Get model/collection reference
-      modelOrCollection = @model or @collection
-      unless modelOrCollection
-        throw new TypeError 'View#modelBind: no model or collection set'
-
-      # Ensure that a handler isn’t registered twice
-      modelOrCollection.off type, handler, this
-
-      # Register model handler, force context to the view
-      modelOrCollection.on type, handler, this
-
-    # Unbind from a model event
-
-    modelUnbind: (type, handler) ->
-      if typeof type isnt 'string'
-        throw new TypeError 'View#modelUnbind: ' +
-          'type argument must be a string'
-      if typeof handler isnt 'function'
-        throw new TypeError 'View#modelUnbind: ' +
-          'handler argument must be a function'
-
-      # Get model/collection reference
-      modelOrCollection = @model or @collection
-      return unless modelOrCollection
-
-      # Remove model handler
-      modelOrCollection.off type, handler
-
-    # Unbind all recorded model event handlers
-    modelUnbindAll: ->
-      # Get model/collection reference
-      modelOrCollection = @model or @collection
-      return unless modelOrCollection
-
-      # Remove all handlers with a context of this view
-      modelOrCollection.off null, null, this
 
     # Setup a simple one-way model-view binding
     # Pass changed attribute values to specific elements in the view
@@ -1017,7 +996,7 @@ require.define 'chaplin/views/view': (exports, require, module) ->
     # text content is set to the model attribute value.
     # Example: @pass 'attribute', '.selector'
     pass: (attribute, selector) ->
-      @modelBind "change:#{attribute}", (model, value) =>
+      @listenTo @model, "change:#{attribute}", (model, value) =>
         $el = @$(selector)
         if $el.is('input, textarea, select, button')
           $el.val value
@@ -1073,27 +1052,25 @@ require.define 'chaplin/views/view': (exports, require, module) ->
     # Get the model/collection data for the templating function
     # Uses optimized Chaplin serialization if available.
     getTemplateData: ->
-      if @model
-        templateData = if @model instanceof Model
+      templateData = if @model
+        if @model instanceof Model
           @model.serialize()
         else
           utils.beget @model.attributes
       else if @collection
-        # Collection: Serialize all models
-        if @collection instanceof Collection
-          items = @collection.serialize()
+        # Collection: Serialize all models.
+        items = if @collection instanceof Collection
+          @collection.serialize()
         else
-          items = []
-          for model in @collection.models
-            items.push utils.beget(model.attributes)
-        templateData = {items}
+          @collection.map (model) ->
+            utils.beget model.attributes
+        {items}
       else
-        # Empty object
-        templateData = {}
+        # Empty object.
+        {}
 
       modelOrCollection = @model or @collection
       if modelOrCollection
-
         # If the model/collection is a Deferred, add a `resolved` flag,
         # but only if it’s not present yet
         if typeof modelOrCollection.state is 'function' and
@@ -1169,14 +1146,17 @@ require.define 'chaplin/views/view': (exports, require, module) ->
     dispose: ->
       return if @disposed
 
+      throw new Error('Your `initialize` method must include a super call to
+        Chaplin `initialize`') unless @subviews?
+
       # Dispose subviews
       subview.dispose() for subview in @subviews
 
       # Unbind handlers of global events
       @unsubscribeAllEvents()
 
-      # Unbind all model handlers
-      @modelUnbindAll()
+      # Unbind all referenced handlers
+      @stopListening()
 
       # Remove all event handlers on this module
       @off()
@@ -1282,6 +1262,16 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
     # Track a list of the visible views
     visibleItems: null
 
+    # Constructor
+    # -----------
+
+    constructor: (options) ->
+      # Apply options to view instance
+      if (options)
+        _(this).extend _.pick options, ['renderItems', 'itemView']
+
+      super
+
     # Initialization
     # --------------
 
@@ -1294,19 +1284,31 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
       # Start observing the collection
       @addCollectionListeners()
 
-      # Apply options
-      @renderItems = options.renderItems if options.renderItems?
-      @itemView = options.itemView       if options.itemView?
-      @filter options.filterer           if options.filterer?
+      # Apply a filter if one provided
+      @filter options.filterer if options.filterer?
 
     # Binding of collection listeners
     addCollectionListeners: ->
-      @modelBind 'add',    @itemAdded
-      @modelBind 'remove', @itemRemoved
-      @modelBind 'reset',  @itemsResetted
+      @listenTo @collection, 'add',    @itemAdded
+      @listenTo @collection, 'remove', @itemRemoved
+      @listenTo @collection, 'reset sort',  @itemsResetted
 
     # Rendering
     # ---------
+
+    # Override View#getTemplateData, don’t serialize collection items here.
+    getTemplateData: ->
+      templateData = {length: @collection.length}
+
+      # If the collection is a Deferred, add a `resolved` flag
+      if typeof @collection.state is 'function'
+        templateData.resolved = @collection.state() is 'resolved'
+
+      # If the collection is a SyncMachine, add a `synced` flag
+      if typeof @collection.isSynced is 'function'
+        templateData.synced = @collection.isSynced()
+
+      templateData
 
     # In contrast to normal views, a template is not mandatory
     # for CollectionViews. Provide an empty `getTemplateFunction`.
@@ -1353,7 +1355,7 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
       @on 'visibilityChange', @showHideFallback
 
       # Listen for sync events on the collection
-      @modelBind 'syncStateChange', @showHideFallback
+      @listenTo @collection, 'syncStateChange', @showHideFallback
 
       # Set visibility initially
       @showHideFallback()
@@ -1383,7 +1385,7 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
       @$loading = @$(@loadingSelector)
 
       # Listen for sync events on the collection
-      @modelBind 'syncStateChange', @showHideLoadingIndicator
+      @listenTo @collection, 'syncStateChange', @showHideLoadingIndicator
 
       # Set visibility initially
       @showHideLoadingIndicator()
@@ -1656,12 +1658,12 @@ require.define 'chaplin/lib/route': (exports, require, module) ->
 
     # Create a route for a URL pattern and a controller action
     # e.g. new Route '/users/:id', 'users#show'
-    constructor: (pattern, target, @options = {}) ->
-      # Save the raw pattern
-      @pattern = pattern
+    constructor: (@pattern, @controller, @action, @options = {}) ->
+      # Store the name on the route if given
+      @name = @options.name if @options.name?
 
-      # Separate target into controller and controller action
-      [@controller, @action] = target.split('#')
+      # Initialise list of :params which the route will use.
+      @paramNames = []
 
       # Check if the action is a reserved name
       if _(Controller.prototype).has @action
@@ -1669,9 +1671,37 @@ require.define 'chaplin/lib/route': (exports, require, module) ->
 
       @createRegExp()
 
+    reverse: (params) ->
+      url = @pattern
+      # TODO: add support for regular expressions in reverser.
+      return false if _.isRegExp url
+      notEnoughParams = 'Route#reverse: Not enough parameters to reverse'
+
+      if _.isArray params
+        # Ensure we have enough parameters
+        throw new Error notEnoughParams if params.length < @paramNames.length
+
+        index = 0
+        url = url.replace /[:*][^\/\?]+/g, (match) ->
+          result = params[index]
+          index += 1
+          result
+      else
+        # From a params hash; we need to be able to return
+        # the actual URL this route represents
+        # Iterate and attempt to replace params in pattern
+        for name in @paramNames
+          value = params[name]
+          throw new Error notEnoughParams if value is undefined
+          url = url.replace ///[:*]#{name}///g, value
+
+      # If the url tests out good; return the url; else, false
+      if @test url then url else false
+
     createRegExp: ->
-      if _.isRegExp(@pattern)
+      if _.isRegExp @pattern
         @regExp = @pattern
+        @paramNames = @options.names if _.isArray @options.names
         return
 
       pattern = @pattern
@@ -1685,7 +1715,6 @@ require.define 'chaplin/lib/route': (exports, require, module) ->
       @regExp = ///^#{pattern}(?=\?|$)///
 
     addParamName: (match, paramName) =>
-      @paramNames ?= []
       # Test if parameter name is reserved
       if _(reservedParams).include(paramName)
         throw new Error "Route#addParamName: parameter name #{paramName} is reserved"
@@ -1716,39 +1745,28 @@ require.define 'chaplin/lib/route': (exports, require, module) ->
       return true
 
     # The handler which is called by Backbone.History when the route matched.
-    # It is also called by Router#follow which might pass options
-    handler: (path, options) =>
+    # It is also called by Router#route which might pass options
+    handler: (path, options = {}) =>
       # Build params hash
-      params = @buildParams path, options
+      params = @buildParams path
+
+      # Add a `path` routing option with the whole path match
+      options.path = path
 
       # Publish a global matchRoute event passing the route and the params
-      @publishEvent 'matchRoute', this, params
+      # Original options hash forwarded to allow further forwarding to backbone
+      @publishEvent 'matchRoute', this, params, options
 
     # Create a proper Rails-like params hash, not an array like Backbone
-    # `matches` and `additionalParams` arguments are optional
-    buildParams: (path, options) ->
-      params = {}
-
-      # Add params from query string
-      queryParams = @extractQueryParams path
-      _(params).extend queryParams
-
-      # Add named params from pattern matches
-      patternParams = @extractParams path
-      _(params).extend patternParams
-
-      # Add additional params from options
-      # (they might overwrite params extracted from URL)
-      _(params).extend @options.params
-
-      # Add a `changeURL` param whether to change the URL after routing
-      # Defaults to false unless explicitly set in options
-      params.changeURL = Boolean(options and options.changeURL)
-
-      # Add a `path  param with the whole path match
-      params.path = path
-
-      params
+    buildParams: (path) ->
+      _.extend {},
+        # Add params from query string
+        @extractQueryParams(path),
+        # Add named params from pattern matches
+        @extractParams(path),
+        # Add additional params from options
+        # (they might overwrite params extracted from URL)
+        @options.params
 
     # Extract named parameters from the URL path
     extractParams: (path) ->
@@ -1759,7 +1777,7 @@ require.define 'chaplin/lib/route': (exports, require, module) ->
 
       # Fill the hash using the paramNames and the matches
       for match, index in matches.slice(1)
-        paramName = if @paramNames then @paramNames[index] else index
+        paramName = if @paramNames.length then @paramNames[index] else index
         params[paramName] = match
 
       params
@@ -1819,6 +1837,8 @@ require.define 'chaplin/lib/router': (exports, require, module) ->
         pushState: true
 
       @subscribeEvent '!router:route', @routeHandler
+      @subscribeEvent '!router:routeByName', @routeByNameHandler
+      @subscribeEvent '!router:reverse', @reverseHandler
       @subscribeEvent '!router:changeURL', @changeURLHandler
 
       @createHistory()
@@ -1837,10 +1857,24 @@ require.define 'chaplin/lib/router': (exports, require, module) ->
       Backbone.history.stop() if Backbone.History.started
 
     # Connect an address with a controller action
-    # Directly create a route on the Backbone.History instance
+    # Creates a route on the Backbone.History instance
     match: (pattern, target, options = {}) =>
+      if arguments.length is 2 and typeof target is 'object'
+        # Handles cases like `match 'url', controller: 'c', action: 'a'`.
+        options = target
+        {controller, action} = options
+        unless controller and action
+          throw new Error 'Router#match must receive either target or options.controller & options.action'
+      else
+        # Handles `match 'url', 'c#a'`.
+        {controller, action} = options
+        if controller or action
+          throw new Error 'Router#match cannot use both target and options.controller / action'
+        # Separate target into controller and controller action.
+        [controller, action] = target.split('#')
+
       # Create the route
-      route = new Route pattern, target, options
+      route = new Route pattern, controller, action, options
       # Register the route at the Backbone.History instance.
       # Don’t use Backbone.history.route here because it calls
       # handlers.unshift, inserting the handler at the top of the list.
@@ -1853,29 +1887,72 @@ require.define 'chaplin/lib/router': (exports, require, module) ->
     # This looks quite like Backbone.History::loadUrl but it
     # accepts an absolute URL with a leading slash (e.g. /foo)
     # and passes a changeURL param to the callback function.
-    route: (path) =>
+    route: (path, options = {}) =>
+      _(options).defaults
+        changeURL: true
+
       # Remove leading hash or slash
       path = path.replace /^(\/#|\/)/, ''
       for handler in Backbone.history.handlers
         if handler.route.test(path)
-          handler.callback path, changeURL: true
+          handler.callback path, options
           return true
       false
 
+    reverseHandler: (name, params, callback) ->
+      callback @reverse name, params
+
+    # Find the URL for a given name using the registered routes and
+    # provided parameters.
+    reverse: (name, params) ->
+      # First filter the route handlers to those that are of the same
+      # name
+      for handler in Backbone.history.handlers when handler.route.name is name
+        # Attempt to reverse using the provided parameter hash
+        url = handler.route.reverse params
+
+        # Return the url if we got a valid one; else we continue on
+        return url if url isnt false
+
+      # We didn't get anything
+      false
+
     # Handler for the global !router:route event
-    routeHandler: (path, callback) ->
-      routed = @route path
+    routeHandler: (path, options, callback) ->
+      # Support old signature: Assume only path and callback were passed
+      # if we only got two arguments
+      if arguments.length is 2 and typeof options is 'function'
+        callback = options
+        options = {}
+
+      routed = @route path, options
       callback? routed
 
+    routeByNameHandler: (name, params, callback) ->
+      # Support old signature: Assume only path and callback were passed
+      # if we only got two arguments
+      if arguments.length is 2 and typeof params is 'function'
+        callback = params
+        params = {}
+
+      path = @reverse name, params
+      return unless path
+      @routeHandler path, callback
+
     # Change the current URL, add a history entry.
-    # Do not trigger any routes (which is Backbone’s
-    # default behavior, but added for clarity)
-    changeURL: (url) ->
-      Backbone.history.navigate url, trigger: false
+    changeURL: (url, options = {}) ->
+      navigateOptions =
+        # Do not trigger or replace per default
+        trigger: options.trigger is true
+        replace: options.replace is true
+
+      # Navigate to the passed URL and forward options to Backbone
+      Backbone.history.navigate url, navigateOptions
 
     # Handler for the global !router:changeURL event
-    changeURLHandler: (url) ->
-      @changeURL url
+    # Accepts both the url and an options hash that is forwarded to Backbone
+    changeURLHandler: (url, options) ->
+      @changeURL url, options
 
     # Disposal
     # --------
@@ -2183,6 +2260,34 @@ require.define 'chaplin/lib/utils': (exports, require, module) ->
       else
         ->
           false
+
+    # Get the whole chain of object prototypes.
+    getPrototypeChain: (object) ->
+      chain = [object]
+      chain.push object while object = object.constructor?.__super__
+      chain
+
+    # Function Helpers
+    # ----------------
+
+    # Wrap a method in order to call the corresponding
+    # `after-` method automatically (e.g. `afterRender` or
+    # `afterInitialize`)
+    wrapMethod: (instance, name) ->
+      # Enclose the original function
+      func = instance[name]
+      # Set a flag
+      instance["#{name}IsWrapped"] = true
+      # Create the wrapper method
+      instance[name] = ->
+        # Stop if the instance was already disposed
+        return false if instance.disposed
+        # Call the original method
+        func.apply instance, arguments
+        # Call the corresponding `after-` method
+        instance["after#{utils.upcase(name)}"] arguments...
+        # Return the view
+        instance
 
     # String Helpers
     # --------------
