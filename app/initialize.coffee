@@ -1,4 +1,4 @@
-Application = require 'application'
+Application = require '/application'
 
 # Initialize the application on DOM ready event.
 $ ->
