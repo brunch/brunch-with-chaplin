@@ -1,4 +1,4 @@
-Chaplin = require 'chaplin'
+Chaplin = require '/chaplin'
 
 # Application-specific utilities
 # ------------------------------

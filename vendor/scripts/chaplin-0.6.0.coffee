@@ -9,17 +9,17 @@ http://chaplinjs.org
 'use strict'
 
 require.define
-  'jquery': (require, exports, module) -> module.exports = $
-  'underscore': (require, exports, module) -> module.exports = _
-  'backbone': (require, exports, module) -> module.exports = Backbone
+  'jquery.js': (exports, require, module) -> module.exports = $
+  'underscore.js': (exports, require, module) -> module.exports = _
+  'backbone.js': (exports, require, module) -> module.exports = Backbone
 
-require.define 'chaplin/application': (exports, require, module) ->
-  Backbone = require 'backbone'
-  mediator = require 'chaplin/mediator'
-  Dispatcher = require 'chaplin/dispatcher'
-  Layout = require 'chaplin/views/layout'
-  Router = require 'chaplin/lib/router'
-  EventBroker = require 'chaplin/lib/event_broker'
+require.define 'chaplin/application.js': (exports, require, module) ->
+  Backbone = require '../backbone'
+  mediator = require './mediator'
+  Dispatcher = require './dispatcher'
+  Layout = require './views/layout'
+  Router = require './lib/router'
+  EventBroker = require './lib/event_broker'
 
   # The application bootstrapper
   # ----------------------------
@@ -82,11 +82,11 @@ require.define 'chaplin/application': (exports, require, module) ->
       # You’re frozen when your heart’s not open
       Object.freeze? this
 
-require.define 'chaplin/mediator': (exports, require, module) ->
-  _ = require 'underscore'
-  Backbone = require 'backbone'
-  support = require 'chaplin/lib/support'
-  utils = require 'chaplin/lib/utils'
+require.define 'chaplin/mediator.js': (exports, require, module) ->
+  _ = require '../underscore'
+  Backbone = require '../backbone'
+  support = require './lib/support'
+  utils = require './lib/utils'
 
   # Mediator
   # --------
@@ -136,11 +136,11 @@ require.define 'chaplin/mediator': (exports, require, module) ->
   # Return our creation
   module.exports = mediator
 
-require.define 'chaplin/dispatcher': (exports, require, module) ->
-  _ = require 'underscore'
-  Backbone = require 'backbone'
-  utils = require 'chaplin/lib/utils'
-  EventBroker = require 'chaplin/lib/event_broker'
+require.define 'chaplin/dispatcher.js': (exports, require, module) ->
+  _ = require '../underscore'
+  Backbone = require '../backbone'
+  utils = require './lib/utils'
+  EventBroker = require './lib/event_broker'
 
   module.exports = class Dispatcher
 
@@ -231,7 +231,7 @@ require.define 'chaplin/dispatcher': (exports, require, module) ->
       if define?.amd
         require [path], handler
       else
-        handler require path
+        handler require "/#{path}"
 
     controllerLoaded: (controllerName, action, params, options, ControllerConstructor) ->
       # Shortcuts for the old controller
@@ -361,10 +361,10 @@ require.define 'chaplin/dispatcher': (exports, require, module) ->
       # You’re frozen when your heart’s not open
       Object.freeze? this
 
-require.define 'chaplin/controllers/controller': (exports, require, module) ->
-  _ = require 'underscore'
-  Backbone = require 'backbone'
-  EventBroker = require 'chaplin/lib/event_broker'
+require.define 'chaplin/controllers/controller.js': (exports, require, module) ->
+  _ = require '../../underscore'
+  Backbone = require '../../backbone'
+  EventBroker = require '../lib/event_broker'
 
   module.exports = class Controller
 
@@ -436,11 +436,11 @@ require.define 'chaplin/controllers/controller': (exports, require, module) ->
       # You're frozen when your heart’s not open
       Object.freeze? this
 
-require.define 'chaplin/models/collection': (exports, require, module) ->
-  _ = require 'underscore'
-  Backbone = require 'backbone'
-  EventBroker = require 'chaplin/lib/event_broker'
-  Model = require 'chaplin/models/model'
+require.define 'chaplin/models/collection.js': (exports, require, module) ->
+  _ = require '../../underscore'
+  Backbone = require '../../backbone'
+  EventBroker = require '../lib/event_broker'
+  Model = require './model'
 
   # Abstract class which extends the standard Backbone collection
   # in order to add some functionality
@@ -516,11 +516,11 @@ require.define 'chaplin/models/collection': (exports, require, module) ->
       # You’re frozen when your heart’s not open
       Object.freeze? this
 
-require.define 'chaplin/models/model': (exports, require, module) ->
-  _ = require 'underscore'
-  Backbone = require 'backbone'
-  utils = require 'chaplin/lib/utils'
-  EventBroker = require 'chaplin/lib/event_broker'
+require.define 'chaplin/models/model.js': (exports, require, module) ->
+  _ = require '../../underscore'
+  Backbone = require '../../backbone'
+  utils = require '../lib/utils'
+  EventBroker = require '../lib/event_broker'
 
   module.exports = class Model extends Backbone.Model
 
@@ -633,12 +633,12 @@ require.define 'chaplin/models/model': (exports, require, module) ->
       # You’re frozen when your heart’s not open
       Object.freeze? this
 
-require.define 'chaplin/views/layout': (exports, require, module) ->
-  $ = require 'jquery'
-  _ = require 'underscore'
-  Backbone = require 'backbone'
-  utils = require 'chaplin/lib/utils'
-  EventBroker = require 'chaplin/lib/event_broker'
+require.define 'chaplin/views/layout.js': (exports, require, module) ->
+  $ = require '../../jquery'
+  _ = require '../../underscore'
+  Backbone = require '../../backbone'
+  utils = require '../lib/utils'
+  EventBroker = require '../lib/event_broker'
 
   module.exports = class Layout # This class does not extend View
 
@@ -815,14 +815,14 @@ require.define 'chaplin/views/layout': (exports, require, module) ->
       # You’re frozen when your heart’s not open
       Object.freeze? this
 
-require.define 'chaplin/views/view': (exports, require, module) ->
-  $ = require 'jquery'
-  _ = require 'underscore'
-  Backbone = require 'backbone'
-  utils = require 'chaplin/lib/utils'
-  EventBroker = require 'chaplin/lib/event_broker'
-  Model = require 'chaplin/models/model'
-  Collection = require 'chaplin/models/collection'
+require.define 'chaplin/views/view.js': (exports, require, module) ->
+  $ = require '../../jquery'
+  _ = require '../../underscore'
+  Backbone = require '../../backbone'
+  utils = require '../lib/utils'
+  EventBroker = require '../lib/event_broker'
+  Model = require '../models/model'
+  Collection = require '../models/collection'
 
   module.exports = class View extends Backbone.View
 
@@ -1181,10 +1181,10 @@ require.define 'chaplin/views/view': (exports, require, module) ->
       # You’re frozen when your heart’s not open
       Object.freeze? this
 
-require.define 'chaplin/views/collection_view': (exports, require, module) ->
-  $ = require 'jquery'
-  _ = require 'underscore'
-  View = require 'chaplin/views/view'
+require.define 'chaplin/views/collection_view.js': (exports, require, module) ->
+  $ = require '../../jquery'
+  _ = require '../../underscore'
+  View = require './view'
 
   # General class for rendering Collections.
   # Derive this class and declare at least `itemView` or override
@@ -1635,11 +1635,11 @@ require.define 'chaplin/views/collection_view': (exports, require, module) ->
       # Self-disposal
       super
 
-require.define 'chaplin/lib/route': (exports, require, module) ->
-  _ = require 'underscore'
-  Backbone = require 'backbone'
-  EventBroker = require 'chaplin/lib/event_broker'
-  Controller = require 'chaplin/controllers/controller'
+require.define 'chaplin/lib/route.js': (exports, require, module) ->
+  _ = require '../../underscore'
+  Backbone = require '../../backbone'
+  EventBroker = require './event_broker'
+  Controller = require '../controllers/controller'
 
   module.exports = class Route
 
@@ -1813,12 +1813,12 @@ require.define 'chaplin/lib/route': (exports, require, module) ->
 
       params
 
-require.define 'chaplin/lib/router': (exports, require, module) ->
-  _ = require 'underscore'
-  Backbone = require 'backbone'
-  mediator = require 'chaplin/mediator'
-  EventBroker = require 'chaplin/lib/event_broker'
-  Route = require 'chaplin/lib/route'
+require.define 'chaplin/lib/router.js': (exports, require, module) ->
+  _ = require '../../underscore'
+  Backbone = require '../../backbone'
+  mediator = require '../mediator'
+  EventBroker = require './event_broker'
+  Route = require './route'
 
   # The router which is a replacement for Backbone.Router.
   # Like the standard router, it creates a Backbone.History
@@ -1974,7 +1974,7 @@ require.define 'chaplin/lib/router': (exports, require, module) ->
       # You’re frozen when your heart’s not open
       Object.freeze? this
 
-require.define 'chaplin/lib/delayer': (exports, require, module) ->
+require.define 'chaplin/lib/delayer.js': (exports, require, module) ->
 
   # Delayer
   # -------
@@ -2051,8 +2051,8 @@ require.define 'chaplin/lib/delayer': (exports, require, module) ->
 
   module.exports = Delayer
 
-require.define 'chaplin/lib/event_broker': (exports, require, module) ->
-  mediator = require 'chaplin/mediator'
+require.define 'chaplin/lib/event_broker.js': (exports, require, module) ->
+  mediator = require '../mediator'
 
   # Add functionality to subscribe and publish to global
   # Publish/Subscribe events so they can be removed afterwards
@@ -2111,7 +2111,7 @@ require.define 'chaplin/lib/event_broker': (exports, require, module) ->
 
   module.exports = EventBroker
 
-require.define 'chaplin/lib/support': (exports, require, module) ->
+require.define 'chaplin/lib/support.js': (exports, require, module) ->
 
   # Feature detection
   # -----------------
@@ -2133,7 +2133,7 @@ require.define 'chaplin/lib/support': (exports, require, module) ->
 
   module.exports = support
 
-require.define 'chaplin/lib/sync_machine': (exports, require, module) ->
+require.define 'chaplin/lib/sync_machine.js': (exports, require, module) ->
 
   # Simple finite state machine for synchronization of models/collections
   # Three states: unsynced, syncing and synced
@@ -2222,8 +2222,8 @@ require.define 'chaplin/lib/sync_machine': (exports, require, module) ->
 
   module.exports = SyncMachine
 
-require.define 'chaplin/lib/utils': (exports, require, module) ->
-  support = require 'chaplin/lib/support'
+require.define 'chaplin/lib/utils.js': (exports, require, module) ->
+  support = require './support'
 
   # Utilities
   # ---------
@@ -2316,23 +2316,23 @@ require.define 'chaplin/lib/utils': (exports, require, module) ->
 
   module.exports = utils
 
-require.define 'chaplin': (exports, require, module) ->
-  Application = require 'chaplin/application'
-  mediator = require 'chaplin/mediator'
-  Dispatcher = require 'chaplin/dispatcher'
-  Controller = require 'chaplin/controllers/controller'
-  Collection = require 'chaplin/models/collection'
-  Model = require 'chaplin/models/model'
-  Layout = require 'chaplin/views/layout'
-  View = require 'chaplin/views/view'
-  CollectionView = require 'chaplin/views/collection_view'
-  Route = require 'chaplin/lib/route'
-  Router = require 'chaplin/lib/router'
-  Delayer = require 'chaplin/lib/delayer'
-  EventBroker = require 'chaplin/lib/event_broker'
-  support = require 'chaplin/lib/support'
-  SyncMachine = require 'chaplin/lib/sync_machine'
-  utils = require 'chaplin/lib/utils'
+require.define 'chaplin/index.js': (exports, require, module) ->
+  Application = require './application'
+  mediator = require './mediator'
+  Dispatcher = require './dispatcher'
+  Controller = require './controllers/controller'
+  Collection = require './models/collection'
+  Model = require './models/model'
+  Layout = require './views/layout'
+  View = require './views/view'
+  CollectionView = require './views/collection_view'
+  Route = require './lib/route'
+  Router = require './lib/router'
+  Delayer = require './lib/delayer'
+  EventBroker = require './lib/event_broker'
+  support = require './lib/support'
+  SyncMachine = require './lib/sync_machine'
+  utils = require './lib/utils'
 
   module.exports = {
     Application,
