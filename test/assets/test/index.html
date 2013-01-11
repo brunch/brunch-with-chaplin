@@ -8,7 +8,12 @@
   <script src="../javascripts/app.js"></script>
   <script src="javascripts/test-vendor.js"></script>
   <script src="javascripts/test.js"></script>
-  <script>$(function() {mocha.run()});</script>
+  <script>
+  $(function() {
+    if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
+    else { mocha.run(); }
+  });
+  </script>
 </head>
 <body>
   <div id="mocha"></div>
