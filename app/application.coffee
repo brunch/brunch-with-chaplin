@@ -4,7 +4,7 @@ Layout = require 'views/layout'
 mediator = require 'mediator'
 routes = require 'routes'
 
-# The application object
+# The application object.
 module.exports = class Application extends Chaplin.Application
   # Set your application name here so the document title is set to
   # “Controller title – Site title” (see Layout#adjustTitle)
@@ -13,23 +13,23 @@ module.exports = class Application extends Chaplin.Application
   initialize: ->
     super
 
-    # Initialize core components
+    # Initialize core components.
     @initDispatcher controllerSuffix: '-controller'
     @initLayout()
     @initMediator()
 
-    # Application-specific scaffold
+    # Application-specific scaffold.
     @initControllers()
 
-    # Register all routes and start routing
-    @initRouter routes
+    # Register all routes and start routing.
     # You might pass Router/History options as the second parameter.
     # Chaplin enables pushState per default and Backbone uses / as
     # the root per default. You might change that in the options
     # if necessary:
     # @initRouter routes, pushState: false, root: '/subdir/'
+    @initRouter routes
 
-    # Freeze the application instance to prevent further changes
+    # Freeze the application instance to prevent further changes.
     Object.freeze? this
 
   # Override standard layout initializer
@@ -56,5 +56,5 @@ module.exports = class Application extends Chaplin.Application
     # Add additional application-specific properties and methods
     # e.g. mediator.prop = null
 
-    # Seal the mediator
+    # Seal the mediator.
     mediator.seal()
