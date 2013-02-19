@@ -22,8 +22,11 @@ Handlebars.registerHelper 'without', (context, options) ->
   Handlebars.helpers.with.call(this, context, options)
 
 # Get Chaplin-declared named routes. {{#url "like" "105"}}{{/url}}
-Handlebars.registerHelper 'url', (routeName, params...) ->
+Handlebars.registerHelper 'url', (routeName, params..., options) ->
   url = null
   mediator.publish '!router:reverse', routeName, params, (result) ->
-    url = result
-  "/#{url}"
+    url = if result
+      "/#{result}"
+    else
+      routeName
+  url
