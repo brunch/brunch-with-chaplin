@@ -1,5 +1,5 @@
 exports.config =
-  # See http://brunch.readthedocs.org/en/latest/config.html for documentation.
+  # See http://brunch.io/#documentation for documentation.
   files:
     javascripts:
       joinTo:
