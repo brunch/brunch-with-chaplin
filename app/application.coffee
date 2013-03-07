@@ -17,6 +17,7 @@ module.exports = class Application extends Chaplin.Application
     @initDispatcher controllerSuffix: '-controller'
     @initLayout()
     @initMediator()
+    @initComposer()
 
     # Application-specific scaffold.
     @initControllers()
