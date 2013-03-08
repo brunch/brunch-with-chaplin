@@ -1,5 +1,4 @@
 Chaplin = require 'chaplin'
-HeaderController = require 'controllers/header-controller'
 Layout = require 'views/layout'
 mediator = require 'mediator'
 routes = require 'routes'
@@ -19,9 +18,6 @@ module.exports = class Application extends Chaplin.Application
     @initMediator()
     @initComposer()
 
-    # Application-specific scaffold.
-    @initControllers()
-
     # Register all routes and start routing.
     # You might pass Router/History options as the second parameter.
     # Chaplin enables pushState per default and Backbone uses / as
@@ -39,17 +35,6 @@ module.exports = class Application extends Chaplin.Application
     # Use an application-specific Layout class. Currently this adds
     # no features to the standard Chaplin Layout, it’s an empty placeholder.
     @layout = new Layout {@title}
-
-  # Instantiate common controllers
-  # ------------------------------
-  initControllers: ->
-    # These controllers are active during the whole application runtime.
-    # You don’t need to instantiate all controllers here, only special
-    # controllers which do not to respond to routes. They may govern models
-    # and views which are needed the whole time, for example header, footer
-    # or navigation views.
-    # e.g. new NavigationController()
-    new HeaderController()
 
   # Create additional mediator properties
   # -------------------------------------
