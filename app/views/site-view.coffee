@@ -6,7 +6,6 @@ module.exports = class SiteView extends View
   container: 'body'
   id: 'site-container'
 
-  initialize: ->
-    super
-    @registerRegion '#header-container', 'header'
-    @registerRegion '#page-container', 'main'
+  regions:
+    '#header-container': 'header'
+    '#page-container': 'main'
