@@ -1,0 +1,12 @@
+{
+  "files": [],
+  "dependencies": [
+    {"name": "controller", "params": "{{name}}"},
+    {"name": "model", "params": "{{name}}"},
+    {"name": "view", "params": "{{name}}"},
+    {"name": "collection", "params": "{{name}}"},
+    {"name": "collection-view", "params": "{{name}}"},
+    {"name": "style", "params": "{{name}}"},
+    {"name": "template", "params": "{{name}}"}
+  ]
+}
