@@ -3,10 +3,18 @@
   "dependencies": [
     {"name": "controller", "params": "{{name}}"},
     {"name": "model", "params": "{{name}}"},
-    {"name": "view", "params": "{{name}}"},
     {"name": "collection", "params": "{{name}}"},
+
+    {"name": "view", "params": "{{name}}-item"},
+    {"name": "style", "params": "{{name}}-item"},
+    {"name": "template", "params": "{{name}}-item"},
+
+    {"name": "view", "params": "{{name}}-page"},
+    {"name": "style", "params": "{{name}}-page"},
+    {"name": "template", "params": "{{name}}-page"},
+
     {"name": "collection-view", "params": "{{name}}"},
-    {"name": "style", "params": "{{name}}"},
-    {"name": "template", "params": "{{name}}"}
+    {"name": "style", "params": "{{name}}-collection"},
+    {"name": "template", "params": "{{name}}-collection"}
   ]
 }
