@@ -13,8 +13,8 @@
     {"name": "style", "params": "{{name}}-page"},
     {"name": "template", "params": "{{name}}-page"},
 
-    {"name": "collection-view", "params": "{{name}}"},
-    {"name": "style", "params": "{{name}}-collection"},
-    {"name": "template", "params": "{{name}}-collection"}
+    {"name": "collection-view", "params": "{{pluralName}}"},
+    {"name": "style", "params": "{{pluralName}}"},
+    {"name": "template", "params": "{{pluralName}}"}
   ]
 }
