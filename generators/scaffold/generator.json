@@ -1,0 +1,20 @@
+{
+  "files": [],
+  "dependencies": [
+    {"name": "controller", "params": "{{name}}"},
+    {"name": "model", "params": "{{name}}"},
+    {"name": "collection", "params": "{{name}}"},
+
+    {"name": "view", "params": "{{name}}-item"},
+    {"name": "style", "params": "{{name}}-item"},
+    {"name": "template", "params": "{{name}}-item"},
+
+    {"name": "view", "params": "{{name}}-page"},
+    {"name": "style", "params": "{{name}}-page"},
+    {"name": "template", "params": "{{name}}-page"},
+
+    {"name": "collection-view", "params": "{{pluralName}}"},
+    {"name": "style", "params": "{{pluralName}}"},
+    {"name": "template", "params": "{{pluralName}}"}
+  ]
+}
