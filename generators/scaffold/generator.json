@@ -1,5 +1,11 @@
 {
-  "files": [],
+  "files": [
+    {
+      "from": "route.coffee.hbs",
+      "to": "app/routes.coffee",
+      "writeMethod": "append"
+    }
+  ],
   "dependencies": [
     {"name": "controller", "params": "{{name}}"},
     {"name": "model", "params": "{{name}}"},
