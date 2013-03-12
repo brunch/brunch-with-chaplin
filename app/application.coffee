@@ -14,7 +14,7 @@ module.exports = class Application extends Chaplin.Application
     # Initialize core components.
     # ---------------------------
 
-    # Dispatcher listens for routing events and
+    # Dispatcher listens for routing events and initialises controllers.
     @initDispatcher controllerSuffix: '-controller'
 
     # Layout listens for click events & delegates internal links to router.
