@@ -1,7 +1,16 @@
 {
-  "files": [],
+  "files": [
+    {
+      "from": "controller.coffee.hbs",
+      "to": "app/controllers/{{name}}-controller.coffee"
+    },
+    {
+      "from": "route.coffee.hbs",
+      "to": "app/routes.coffee",
+      "method": "append"
+    }
+  ],
   "dependencies": [
-    {"name": "controller", "params": "{{name}}"},
     {"name": "model", "params": "{{name}}"},
     {"name": "collection", "params": "{{name}}"},
 
