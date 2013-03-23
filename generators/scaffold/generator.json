@@ -7,7 +7,7 @@
     {
       "from": "route.coffee.hbs",
       "to": "app/routes.coffee",
-      "writeMethod": "append"
+      "method": "append"
     }
   ],
   "dependencies": [
