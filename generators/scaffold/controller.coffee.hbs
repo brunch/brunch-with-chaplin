@@ -1,0 +1,20 @@
+Controller = require 'controllers/base/controller'
+{{camelize name}} = require 'models/{{name}}'
+{{camelize name}}PageView = require 'views/{{name}}-page-view'
+{{camelize pluralName}}Collection = require 'models/{{pluralName}}-collection'
+{{camelize pluralName}}CollectionView = require 'views/{{pluralName}}-collection-view'
+
+module.exports = class {{camelize pluralName}}Controller extends Controller
+  historyURL: '{{name}}'
+
+  index: ->
+    @collection = new {{camelize pluralName}}Collection()
+    @view = new {{camelize pluralName}}CollectionView collection: @collection
+    @collection.fetch
+      success: => @view.render()
+
+  show: (params) ->
+    @model = new {{camelize name}} id: params.id
+    @view = new {{camelize name}}PageView model: @model
+    @model.fetch
+      success: => @view.render()
