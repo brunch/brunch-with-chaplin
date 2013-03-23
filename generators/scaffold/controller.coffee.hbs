@@ -1,20 +1,20 @@
 Controller = require 'controllers/base/controller'
-{{camelize name}} = require 'models/{{name}}'
-{{camelize name}}PageView = require 'views/{{name}}-page-view'
-{{camelize pluralName}}Collection = require 'models/{{pluralName}}-collection'
-{{camelize pluralName}}CollectionView = require 'views/{{pluralName}}-collection-view'
+{{#camelize}}{{name}}{{/camelize}} = require 'models/{{name}}'
+{{#camelize}}{{name}}{{/camelize}}PageView = require 'views/{{name}}-page-view'
+{{#camelize}}{{pluralName}}{{/camelize}}Collection = require 'models/{{pluralName}}-collection'
+{{#camelize}}{{pluralName}}{{/camelize}}CollectionView = require 'views/{{pluralName}}-collection-view'
 
-module.exports = class {{camelize pluralName}}Controller extends Controller
+module.exports = class {{#camelize}}{{pluralName}}{{/camelize}}Controller extends Controller
   historyURL: '{{name}}'
 
   index: ->
-    @collection = new {{camelize pluralName}}Collection()
-    @view = new {{camelize pluralName}}CollectionView {@collection}
+    @collection = new {{#camelize}}{{pluralName}}{{/camelize}}Collection()
+    @view = new {{#camelize}}{{pluralName}}{{/camelize}}CollectionView {@collection}
     @collection.fetch
       success: => @view.render()
 
   show: (params) ->
-    @model = new {{camelize name}} id: params.id
-    @view = new {{camelize name}}PageView {@model}
+    @model = new {{#camelize}}{{name}}{{/camelize}} id: params.id
+    @view = new {{#camelize}}{{name}}{{/camelize}}PageView {@model}
     @model.fetch
       success: => @view.render()
