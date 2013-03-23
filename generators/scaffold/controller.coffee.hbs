@@ -9,12 +9,12 @@ module.exports = class {{camelize pluralName}}Controller extends Controller
 
   index: ->
     @collection = new {{camelize pluralName}}Collection()
-    @view = new {{camelize pluralName}}CollectionView collection: @collection
+    @view = new {{camelize pluralName}}CollectionView {@collection}
     @collection.fetch
       success: => @view.render()
 
   show: (params) ->
     @model = new {{camelize name}} id: params.id
-    @view = new {{camelize name}}PageView model: @model
+    @view = new {{camelize name}}PageView {@model}
     @model.fetch
       success: => @view.render()
