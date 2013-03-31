@@ -1,4 +1,5 @@
 mediator = require 'mediator'
+Chaplin = require 'chaplin'
 
 # Application-specific view helpers
 # http://handlebarsjs.com/#helpers
@@ -23,8 +24,4 @@ Handlebars.registerHelper 'without', (context, options) ->
 
 # Get Chaplin-declared named routes. {{#url "like" "105"}}{{/url}}
 Handlebars.registerHelper 'url', (routeName, params..., options) ->
-  url = null
-  # Backbone events are synchronous, so this is possible.
-  mediator.publish '!router:reverse', routeName, params, (result) ->
-    url = if result then "/#{result}" else routeName
-  url
+  Chaplin.helpers.reverse routeName, params
