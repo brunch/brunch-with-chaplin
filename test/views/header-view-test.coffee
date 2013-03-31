@@ -1,5 +1,4 @@
 HeaderView = require 'views/header-view'
-mediator = require 'mediator'
 
 class HeaderViewTest extends HeaderView
   renderTimes: 0

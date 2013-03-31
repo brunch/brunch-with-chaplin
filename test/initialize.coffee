@@ -1,3 +1,8 @@
-require './views/header-view-test'
-require './views/home-page-view-test'
-require './views/site-view-test'
+tests = [
+  './views/header-view-test'
+  './views/home-page-view-test'
+  './views/site-view-test'
+]
+
+for test in tests
+  require test
