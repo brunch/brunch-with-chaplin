@@ -1,5 +1,4 @@
 Chaplin = require 'chaplin'
-mediator = require 'mediator'
 routes = require 'routes'
 
 # The application object.
@@ -43,7 +42,7 @@ module.exports = class Application extends Chaplin.Application
   # Create additional mediator properties.
   initMediator: ->
     # Add additional application-specific properties and methods
-    # e.g. mediator.prop = null
+    # e.g. Chaplin.mediator.prop = null
 
     # Seal the mediator.
-    mediator.seal()
+    Chaplin.mediator.seal()

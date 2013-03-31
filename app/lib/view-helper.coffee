@@ -1,4 +1,3 @@
-mediator = require 'mediator'
 Chaplin = require 'chaplin'
 
 # Application-specific view helpers
