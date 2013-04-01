@@ -1,32 +1,10 @@
 /*!
- * Chaplin 0.8.0
+ * Chaplin 0.8.1
  *
  * Chaplin may be freely distributed under the MIT license.
  * For all details and documentation:
  * http://chaplinjs.org
  */
-
-// Dirty hack for require-ing backbone and underscore.
-(function() {
-  var deps = {
-    backbone: window.Backbone, underscore: window._
-  };
-
-  for (var name in deps) {
-    (function(name) {
-      var definition = {};
-      definition[name] = function(exports, require, module) {
-        module.exports = deps[name];
-      };
-
-      try {
-        require(item);
-      } catch(e) {
-        require.define(definition);
-      }
-    })(name);
-  }
-})();
 
 require.define({'chaplin/application': function(exports, require, module) {
 'use strict';
@@ -806,6 +784,8 @@ module.exports = Layout = (function() {
 
   Layout.prototype.undelegateEvents = Backbone.View.prototype.undelegateEvents;
 
+  Layout.prototype.$ = Backbone.View.prototype.$;
+
   Layout.prototype.hideOldView = function(controller) {
     var scrollTo, view;
     scrollTo = this.settings.scrollTo;
@@ -1052,7 +1032,11 @@ module.exports = View = (function(_super) {
       this.listenTo(this.model, 'dispose', this.dispose);
     }
     if (this.collection) {
-      this.listenTo(this.collection, 'dispose', this.dispose);
+      this.listenTo(this.collection, 'dispose', function(subject) {
+        if (!subject || subject === _this.collection) {
+          return _this.dispose();
+        }
+      });
     }
     if (this.regions != null) {
       this.publishEvent('!region:register', this);
