@@ -6,6 +6,28 @@
  * http://chaplinjs.org
  */
 
+// Dirty hack for require-ing backbone and underscore.
+(function() {
+  var deps = {
+    backbone: window.Backbone, underscore: window._
+  };
+
+  for (var name in deps) {
+    (function(name) {
+      var definition = {};
+      definition[name] = function(exports, require, module) {
+        module.exports = deps[name];
+      };
+
+      try {
+        require(item);
+      } catch(e) {
+        require.define(definition);
+      }
+    })(name);
+  }
+})();
+
 require.define({'chaplin/application': function(exports, require, module) {
 'use strict';
 
