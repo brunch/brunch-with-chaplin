@@ -1,6 +1,5 @@
 ;(function(){
 
-
 // CommonJS require()
 
 function require(p){
@@ -52,9 +51,9 @@ require.register("browser/debug.js", function(module, exports, require){
 
 module.exports = function(type){
   return function(){
-
   }
 };
+
 }); // module: browser/debug.js
 
 require.register("browser/diff.js", function(module, exports, require){
@@ -62,14 +61,14 @@ require.register("browser/diff.js", function(module, exports, require){
 
 /*
  * Text diff implementation.
- *
+ * 
  * This library supports the following APIS:
  * JsDiff.diffChars: Character by character diff
  * JsDiff.diffWords: Word (as defined by \b regex) diff which ignores whitespace
  * JsDiff.diffLines: Line based diff
- *
+ * 
  * JsDiff.diffCss: Diff targeted at CSS content
- *
+ * 
  * These methods are based on the implementation proposed in
  * "An O(ND) Difference Algorithm and its Variations" (Myers, 1986).
  * http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.4.6927
@@ -187,7 +186,7 @@ var JsDiff = (function() {
         while (newPos+1 < newLen && oldPos+1 < oldLen && this.equals(newString[newPos+1], oldString[oldPos+1])) {
           newPos++;
           oldPos++;
-
+          
           this.pushComponent(basePath.components, newString[newPos], undefined, undefined);
         }
         basePath.newPos = newPos;
@@ -209,24 +208,24 @@ var JsDiff = (function() {
         return value;
       }
   };
-
+  
   var CharDiff = new fbDiff();
-
+  
   var WordDiff = new fbDiff(true);
   WordDiff.tokenize = function(value) {
     return removeEmpty(value.split(/(\s+|\b)/));
   };
-
+  
   var CssDiff = new fbDiff(true);
   CssDiff.tokenize = function(value) {
     return removeEmpty(value.split(/([{}:;,]|\s+)/));
   };
-
+  
   var LineDiff = new fbDiff();
   LineDiff.tokenize = function(value) {
     return value.split(/^/m);
   };
-
+  
   return {
     diffChars: function(oldStr, newStr) { return CharDiff.diff(oldStr, newStr); },
     diffWords: function(oldStr, newStr) { return WordDiff.diff(oldStr, newStr); },
@@ -274,7 +273,7 @@ var JsDiff = (function() {
             var prev = diff[i-1];
             oldRangeStart = oldLine;
             newRangeStart = newLine;
-
+            
             if (prev) {
               curRange = contextLines(prev.lines.slice(-4));
               oldRangeStart -= curRange.length;
@@ -805,7 +804,6 @@ Hook.prototype.error = function(err){
   this._error = err;
 };
 
-
 }); // module: hook.js
 
 require.register("interfaces/bdd.js", function(module, exports, require){
@@ -1006,6 +1004,7 @@ module.exports = function(suite){
     }
   }
 };
+
 }); // module: interfaces/exports.js
 
 require.register("interfaces/index.js", function(module, exports, require){
@@ -1549,7 +1548,7 @@ Mocha.prototype.run = function(fn){
   var options = this.options;
   var runner = new exports.Runner(suite);
   var reporter = new this._reporter(runner);
-  runner.ignoreLeaks = options.ignoreLeaks;
+  runner.ignoreLeaks = false !== options.ignoreLeaks;
   runner.asyncOnly = options.asyncOnly;
   if (options.grep) runner.grep(options.grep, options.invert);
   if (options.globals) runner.globals(options.globals);
@@ -2334,8 +2333,6 @@ function HTML(runner, root) {
   });
 
   runner.on('test end', function(test){
-    window.scrollTo(0, document.body.scrollHeight);
-
     // TODO: add to stats
     var percent = stats.tests / this.total * 100 | 0;
     if (progress) progress.update(percent).draw(ctx);
@@ -3100,10 +3097,10 @@ F.prototype = Base.prototype;
 Min.prototype = new F;
 Min.prototype.constructor = Min;
 
+
 }); // module: reporters/min.js
 
 require.register("reporters/nyan.js", function(module, exports, require){
-
 /**
  * Module dependencies.
  */
@@ -3249,44 +3246,39 @@ NyanCat.prototype.drawRainbow = function(){
 NyanCat.prototype.drawNyanCat = function(status) {
   var self = this;
   var startWidth = this.scoreboardWidth + this.trajectories[0].length;
-
-  [0, 1, 2, 3].forEach(function(index) {
-    write('\u001b[' + startWidth + 'C');
-
-    switch (index) {
-      case 0:
-        write('_,------,');
-        write('\n');
-        break;
-      case 1:
-        var padding = self.tick ? '  ' : '   ';
-        write('_|' + padding + '/\\_/\\ ');
-        write('\n');
-        break;
-      case 2:
-        var padding = self.tick ? '_' : '__';
-        var tail = self.tick ? '~' : '^';
-        var face;
-        switch (status) {
-          case 'pass':
-            face = '( ^ .^)';
-            break;
-          case 'fail':
-            face = '( o .o)';
-            break;
-          default:
-            face = '( - .-)';
-        }
-        write(tail + '|' + padding + face + ' ');
-        write('\n');
-        break;
-      case 3:
-        var padding = self.tick ? ' ' : '  ';
-        write(padding + '""  "" ');
-        write('\n');
-        break;
-    }
-  });
+  var color = '\u001b[' + startWidth + 'C';
+  var padding = '';
+  
+  write(color);
+  write('_,------,');
+  write('\n');
+  
+  write(color);
+  padding = self.tick ? '  ' : '   ';
+  write('_|' + padding + '/\\_/\\ ');
+  write('\n');
+  
+  write(color);
+  padding = self.tick ? '_' : '__';
+  var tail = self.tick ? '~' : '^';
+  var face;
+  switch (status) {
+    case 'pass':
+      face = '( ^ .^)';
+      break;
+    case 'fail':
+      face = '( o .o)';
+      break;
+    default:
+      face = '( - .-)';
+  }
+  write(tail + '|' + padding + face + ' ');
+  write('\n');
+  
+  write(color);
+  padding = self.tick ? ' ' : '  ';
+  write(padding + '""  "" ');
+  write('\n');
 
   this.cursorUp(this.numberOfLines);
 };
@@ -4065,9 +4057,7 @@ var EventEmitter = require('browser/events').EventEmitter
   , Test = require('./test')
   , utils = require('./utils')
   , filter = utils.filter
-  , keys = utils.keys
-  , noop = function(){}
-  , immediately = global.setImmediate || process.nextTick;
+  , keys = utils.keys;
 
 /**
  * Non-enumerable globals.
@@ -4118,6 +4108,15 @@ function Runner(suite) {
   this.grep(/.*/);
   this.globals(this.globalProps().concat(['errno']));
 }
+
+/**
+ * Wrapper for setImmediate, process.nextTick, or browser polyfill.
+ *
+ * @param {Function} fn
+ * @api private
+ */
+
+Runner.immediately = global.setImmediate || process.nextTick;
 
 /**
  * Inherit from `EventEmitter.prototype`.
@@ -4304,7 +4303,7 @@ Runner.prototype.hook = function(name, fn){
     });
   }
 
-  immediately(function(){
+  Runner.immediately(function(){
     next(0);
   });
 };
@@ -5234,38 +5233,10 @@ exports.highlightTags = function(name) {
  * the browser.
  */
 
-process = {};
+var process = {};
 process.exit = function(status){};
 process.stdout = {};
 global = window;
-
-/**
- * next tick implementation.
- */
-
-process.nextTick = (function(){
-  // postMessage behaves badly on IE8
-  if (window.ActiveXObject || !window.postMessage) {
-    return function(fn){ fn() };
-  }
-
-  // based on setZeroTimeout by David Baron
-  // - http://dbaron.org/log/20100309-faster-timeouts
-  var timeouts = []
-    , name = 'mocha-zero-timeout'
-
-  window.addEventListener('message', function(e){
-    if (e.source == window && e.data == name) {
-      if (e.stopPropagation) e.stopPropagation();
-      if (timeouts.length) timeouts.shift()();
-    }
-  }, true);
-
-  return function(fn){
-    timeouts.push(fn);
-    window.postMessage(name, '*');
-  }
-})();
 
 /**
  * Remove uncaughtException listener.
@@ -5298,6 +5269,32 @@ process.on = function(e, fn){
 
   var Mocha = window.Mocha = require('mocha'),
       mocha = window.mocha = new Mocha({ reporter: 'html' });
+
+  var immediateQueue = []
+    , immediateTimeout;
+
+  function timeslice() {
+    var immediateStart = new Date().getTime();
+    while (immediateQueue.length && (new Date().getTime() - immediateStart) < 100) {
+      immediateQueue.shift()();
+    }
+    if (immediateQueue.length) {
+      immediateTimeout = setTimeout(timeslice, 0);
+    } else {
+      immediateTimeout = null;
+    }
+  }
+
+  /**
+   * High-performance override of Runner.immediately.
+   */
+
+  Mocha.Runner.immediately = function(callback) {
+    immediateQueue.push(callback);
+    if (!immediateTimeout) {
+      immediateTimeout = setTimeout(timeslice, 0);
+    }
+  };
 
   /**
    * Override ui to ensure that the ui functions are initialized.
