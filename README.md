@@ -1,23 +1,30 @@
 # Brunch with Chaplin
 ![](https://a248.e.akamai.net/camo.github.com/b7ebb8bbcec7938940cf8e9c441124c3bddafd3a/687474703a2f2f662e636c2e6c792f6974656d732f34373039326b30423141334a317a3166306b34362f6277632e706e67)
 
+This is HTML5 application, built with
+[Brunch](http://brunch.io) and
+[Chaplin](http://chaplinjs.org).
+
+## Getting started
+* Install [Brunch](http://brunch.io): `npm install -g brunch`.
+* Install Brunch plugins: `npm install`.
+* Watch the project with continuous rebuild by
+`brunch watch --server`. This will also launch HTTP server.
+* Build the minified project with `brunch build --optimize`.
+* Open the `public/` dir to see the result.
+* Write your code in `app` dir, put scripts in `vendor` dir.
+
+See [Chaplin site](http://chaplinjs.org) for docs and more info.
+
+# For newcomers
+
 Brunch with Chaplin is a skeleton (boilerplate) for [Brunch](http://brunch.io)
 based on [Chaplin](http://chaplinjs.org) architecture.
 
 Requires Brunch 1.6+.
 
-## Getting started
-* Create new project via executing `brunch new <project name>`.
-Brunch with chaplin is a default application skeleton for Brunch,
-so you don't need to specify `--skeleton` option for the command.
-* Build the project with `brunch b` or `brunch w`.
-* Open the `public/` dir to see the result.
-* Write your code.
-
 Example application built with the skeleton:
 [Ost.io](https://github.com/paulmillr/ostio).
-
-See [Chaplin site](http://chaplinjs.org) for docs and more info.
 
 ## Difference from Chaplin Boilerplate
 [Chaplin Boilerplate](https://github.com/chaplinjs/chaplin-boilerplate)
