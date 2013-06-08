@@ -5,5 +5,4 @@ module.exports = class HeaderView extends View
   autoRender: true
   className: 'header'
   region: 'header'
-  id: 'header'
   template: template
