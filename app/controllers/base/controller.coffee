@@ -1,4 +1,3 @@
-Chaplin = require 'chaplin'
 SiteView = require 'views/site-view'
 HeaderView = require 'views/header-view'
 
