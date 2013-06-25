@@ -1,0 +1,20 @@
+{
+  "name": "brunch-with-chaplin",
+  "repo": "paulmillr/brunch-with-chaplin",
+  "description": "",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {
+    "component/dom": "*"
+  },
+  "development": {},
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": [
+    "index.js",
+    "template.js"
+  ],
+  "styles": [
+    "brunch-with-chaplin.css"
+  ]
+}

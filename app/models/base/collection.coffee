@@ -1,5 +1,4 @@
-Chaplin = require 'chaplin'
-Model = require 'models/base/model'
+Model = require './model'
 
 module.exports = class Collection extends Chaplin.Collection
   # Use the project base model per default, not Chaplin.Model

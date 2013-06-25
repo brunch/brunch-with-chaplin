@@ -1,5 +1,5 @@
-View = require 'views/base/view'
-template = require 'views/templates/site'
+View = require './base/view'
+template = require './templates/site'
 
 # Site view is a top-level view which is bound to body.
 module.exports = class SiteView extends View
