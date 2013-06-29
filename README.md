@@ -5,6 +5,9 @@ This is HTML5 application, built with
 [Brunch](http://brunch.io) and
 [Chaplin](http://chaplinjs.org).
 
+## Installation
+Clone this repo manually with Git or use `brunch new --skeleton gh:paulmillr/brunch-with-chaplin`.
+
 ## Getting started
 * Install [Brunch](http://brunch.io): `npm install -g brunch`.
 * Install Brunch plugins: `npm install`.
