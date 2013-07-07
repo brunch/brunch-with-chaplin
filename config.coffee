@@ -7,7 +7,6 @@ exports.config =
         'javascripts/vendor.js': /^(bower_components|vendor)/
         'test/javascripts/test.js': /^test[\\/](?!vendor)/
         'test/javascripts/test-vendor.js': /^test[\\/]vendor/
-      # http://git.io/brunch-concatenation-order
       order:
         after: [
           'test/vendor/scripts/test-helper.js'

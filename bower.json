@@ -2,6 +2,7 @@
   "name": "ostio",
   "repo": "paulmillr/ostio",
   "version": "0.0.1",
+  "main": "public/javascripts/app.js",
   "ignore": [
     "**/.*",
     "node_modules",
