@@ -11,6 +11,7 @@ Clone this repo manually with Git or use `brunch new --skeleton gh:paulmillr/bru
 ## Getting started
 * Install [Brunch](http://brunch.io): `npm install -g brunch`.
 * Install Brunch plugins: `npm install`.
+* Install Bower components: `bower install`
 * Watch the project with continuous rebuild by
 `brunch watch --server`. This will also launch HTTP server.
 * Build the minified project with `brunch build --optimize`.
