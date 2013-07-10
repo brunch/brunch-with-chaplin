@@ -25,7 +25,7 @@ See [Chaplin site](http://chaplinjs.org) for docs and more info.
 Brunch with Chaplin is a skeleton (boilerplate) for [Brunch](http://brunch.io)
 based on [Chaplin](http://chaplinjs.org) architecture.
 
-Requires Brunch 1.6+.
+Requires Brunch 1.7+.
 
 Example application built with the skeleton:
 [Ost.io](https://github.com/paulmillr/ostio).
