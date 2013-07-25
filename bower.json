@@ -1,12 +1,11 @@
 {
-  "name": "ostio",
-  "repo": "paulmillr/ostio",
-  "version": "0.0.1",
+  "name": "example-app",
+  "version": "0.1[.0",
   "main": "public/javascripts/app.js",
   "ignore": [
     "**/.*",
     "node_modules",
-    "components"
+    "bower_components"
   ],
   "dependencies": {
     "chaplin": "~0.10.0",
