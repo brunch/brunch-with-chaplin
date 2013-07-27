@@ -1,8 +1,2 @@
-tests = [
-  './views/header-view-test'
-  './views/home-page-view-test'
-  './views/site-view-test'
-]
-
-for test in tests
-  require test
+# Load all tests.
+window.require.list().filter((_) -> /-test$/.test _).forEach(require)

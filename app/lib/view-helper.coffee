@@ -19,6 +19,6 @@ Handlebars.registerHelper 'without', (context, options) ->
   options.fn = inverse
   Handlebars.helpers.with.call(this, context, options)
 
-# Get Chaplin-declared named routes. {{#url "like" "105"}}{{/url}}
+# Get Chaplin-declared named routes. {{url "likes#show" "105"}}
 Handlebars.registerHelper 'url', (routeName, params..., options) ->
   Chaplin.helpers.reverse routeName, params
