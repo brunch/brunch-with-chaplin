@@ -1,2 +1,3 @@
 # Load all tests.
-window.require.list().filter((_) -> /-test$/.test _).forEach(require)
+for module in window.require.list() when /-test$/.test module
+  require module
