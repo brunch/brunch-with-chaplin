@@ -23,12 +23,13 @@ See [Chaplin site](http://chaplinjs.org) for docs and more info.
 # For newcomers
 
 Brunch with Chaplin is a skeleton (boilerplate) for [Brunch](http://brunch.io)
-based on [Chaplin](http://chaplinjs.org) architecture.
-
-Requires Brunch 1.7+.
+based on [Chaplin](http://chaplinjs.org) architecture. Requires Brunch 1.7+.
 
 Example application built with the skeleton:
 [Ost.io](https://github.com/paulmillr/ostio).
+
+This branch does not contain ready-to-use test environment.
+If you want take a look how tests can be used, see `with-tests` git branch.
 
 ## Difference from Chaplin Boilerplate
 [Chaplin Boilerplate](https://github.com/chaplinjs/chaplin-boilerplate)
