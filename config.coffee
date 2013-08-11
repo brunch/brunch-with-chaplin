@@ -4,17 +4,10 @@ exports.config =
     javascripts:
       joinTo:
         'javascripts/app.js': /^app/
-        'javascripts/vendor.js': /^(bower_components|vendor)/
-        'test/test.js': /^test/
-      order:
-        after: [
-          'test/vendor/scripts/test-helper.js'
-        ]
+        'javascripts/vendor.js': /^(?!app)/
 
     stylesheets:
-      joinTo:
-        'stylesheets/app.css': /^(?!test)/
-        'test/test.css': /^test/
+      joinTo: 'stylesheets/app.css'
       order:
         after: ['vendor/styles/helpers.css']
 
