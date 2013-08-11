@@ -20,6 +20,8 @@ Clone this repo manually with Git or use `brunch new gh:paulmillr/brunch-with-ch
 
 See [Chaplin site](http://chaplinjs.org) for docs and more info.
 
+---------------
+
 # For newcomers
 
 Brunch with Chaplin is a skeleton (boilerplate) for [Brunch](http://brunch.io)
