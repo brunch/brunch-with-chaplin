@@ -8,8 +8,6 @@ exports.config =
 
     stylesheets:
       joinTo: 'stylesheets/app.css'
-      order:
-        after: ['vendor/styles/helpers.css']
 
     templates:
       joinTo: 'javascripts/app.js'
