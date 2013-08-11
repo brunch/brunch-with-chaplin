@@ -4,8 +4,5 @@
       "from": "collection.coffee.hbs",
       "to": "app/models/{{pluralName}}.coffee"
     }
-  ],
-  "dependencies": [
-    {"name": "collection-test", "params": "{{name}}"}
   ]
 }

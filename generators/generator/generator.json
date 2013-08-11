@@ -8,6 +8,5 @@
       "from": "generated_file.coffee.hbs",
       "to": "generators/{{name}}/{{name}}.coffee.hbs"
     }
-  ],
-  "dependencies": []
+  ]
 }

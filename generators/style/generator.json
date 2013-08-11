@@ -4,6 +4,5 @@
       "from": "style.styl.hbs",
       "to": "app/views/styles/{{name}}.styl"
     }
-  ],
-  "dependencies": []
+  ]
 }

@@ -4,8 +4,5 @@
       "from": "model.coffee.hbs",
       "to": "app/models/{{name}}.coffee"
     }
-  ],
-  "dependencies": [
-    {"name": "model-test", "params": "{{name}}"}
   ]
 }

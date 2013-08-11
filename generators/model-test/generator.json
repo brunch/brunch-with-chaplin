@@ -1,9 +1,0 @@
-{
-  "files": [
-    {
-      "from": "model-test.coffee.hbs",
-      "to": "test/models/{{name}}-test.coffee"
-    }
-  ],
-  "dependencies": []
-}
