@@ -9,5 +9,5 @@ Install:
 Usage:
 
     scaffolt view user
-    scaffolt model cart --revert
-    scaffolt controller header --path controllers/regions
+    scaffolt view user -r
+    scaffolt controller header -p controllers/regions
