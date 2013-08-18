@@ -11,19 +11,19 @@
     }
   ],
   "dependencies": [
-    {"name": "model", "params": "{{name}}"},
-    {"name": "collection", "params": "{{name}}"},
+    {"type": "model"},
+    {"type": "collection"},
 
-    {"name": "view", "params": "{{name}}-item"},
-    {"name": "style", "params": "{{name}}-item"},
-    {"name": "template", "params": "{{name}}-item"},
+    {"type": "view", "name": "{{name}}-item"},
+    {"type": "style", "name": "{{name}}-item"},
+    {"type": "template", "name": "{{name}}-item"},
 
-    {"name": "view", "params": "{{name}}-page"},
-    {"name": "style", "params": "{{name}}-page"},
-    {"name": "template", "params": "{{name}}-page"},
+    {"type": "view", "name": "{{name}}-page"},
+    {"type": "style", "name": "{{name}}-page"},
+    {"type": "template", "name": "{{name}}-page"},
 
-    {"name": "collection-view", "params": "{{pluralName}}"},
-    {"name": "style", "params": "{{pluralName}}"},
-    {"name": "template", "params": "{{pluralName}}"}
+    {"type": "collection-view", "name": "{{pluralName}}"},
+    {"type": "style", "name": "{{pluralName}}"},
+    {"type": "template", "name": "{{pluralName}}"}
   ]
 }
