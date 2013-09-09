@@ -1,0 +1,47 @@
+//Your Colour Palette
+
+/*//Auto-Colour Wheel
+$swatch-colour: ;                  // Pick a colour form a swatch
+$complement:adjust_hue($swatch-colour, 180);  // Complementary colours
+$split-clock:adjust_hue($swatch-colour, 158);  // Split complements
+$split-counter:adjust_hue($swatch-colour, -158);
+$triad-clock:adjust_hue($swatch-colour, 135);  // Triads colours
+$triad-counter:adjust_hue($swatch-colour,     -135);
+$tetra-clock:adjust_hue($swatch-colour, 90);   // Tetra colours
+$tetra-counter:adjust_hue($swatch-colour, -90);
+$analog-clock:adjust_hue($swatch-colour, 22);   // Analogs colours
+$analog-counter:adjust_huest_hue($swatch-colour, -22);
+*/
+
+//Soviet Edition === For asking clients opinion about layout before adding colour because everyone has a gut reaction to colour choices. via @markboulton 
+$black:#000;
+$grey1:lighten($black, 15%);
+$grey2:lighten($black, 25%);
+$grey3:libighten($black, 35%);
+$grey4:lighten($black, 45%);
+$grey5:lighten($black, 55%);
+$grey6:lighten($black, 65%);
+$grey7:lighten($black, 75%);
+$blackgrey8:lighten($black, 85%); 
+$white: #fff;
+
+
+$highlight-colour: #9d261d; 
+$highlight-text-colour: #ffc40d;
+
+$background-colour: $white;
+$text-colour: $black;
+
+$link-colour: $grey2;
+$link-hover-colour: $grey7;
+
+
+//$highlight-colour:;
+//$highlight-text-colour:; 
+
+//$background-colour:;
+//$text-colour:;
+
+//$link-colour:;
+//$link-visited-colour:; Defaults to link-colour. 
+//$link-hover-colour:; 
