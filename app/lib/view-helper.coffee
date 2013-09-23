@@ -2,23 +2,26 @@
 # http://handlebarsjs.com/#helpers
 # --------------------------------
 
+register = (name, fn) ->
+  Handlebars.registerHelper name, fn
+
 # Map helpers
 # -----------
 
 # Make 'with' behave a little more mustachey.
-Handlebars.registerHelper 'with', (context, options) ->
+register 'with', (context, options) ->
   if not context or Handlebars.Utils.isEmpty context
     options.inverse(this)
   else
     options.fn(context)
 
 # Inverse for 'with'.
-Handlebars.registerHelper 'without', (context, options) ->
+register 'without', (context, options) ->
   inverse = options.inverse
   options.inverse = options.fn
   options.fn = inverse
   Handlebars.helpers.with.call(this, context, options)
 
 # Get Chaplin-declared named routes. {{url "likes#show" "105"}}
-Handlebars.registerHelper 'url', (routeName, params..., options) ->
+register 'url', (routeName, params..., options) ->
   Chaplin.helpers.reverse routeName, params
