@@ -14,8 +14,8 @@ Clone this repo manually with git or use `brunch new gh:paulmillr/brunch-with-ch
     * [Bower](http://bower.io): `npm install -g bower`
     * Brunch plugins and Bower dependencies: `npm install & bower install`.
 * Run:
-    * `brunch watch --server` — will watch the project with continuous rebuild. This will also launch HTTP server.
-    * `brunch build --production` — will build minified project for production
+    * `brunch watch --server` — watches the project with continuous rebuild. This will also launch HTTP server with [pushState](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
+    * `brunch build --production` — builds minified project for production
 * Learn:
     * `public/` dir is fully auto-generated and served by HTTP server.You should write your code in `app` dir.
     * Place static stuff you want to be copied to `public` in `app/assets`.
