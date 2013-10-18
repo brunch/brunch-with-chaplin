@@ -8,8 +8,8 @@ This is HTML5 application, built with
 Clone this repo manually with git or use `brunch new gh:paulmillr/brunch-with-chaplin`.
 
 ## Getting started
-* Install:
-    * [node.js](http://nodejs.org) if you don't have it (`brew install node` on OS X).
+* Install if you don't have them:
+    * [node.js](http://nodejs.org): `brew install node` on OS X
     * [Brunch](http://brunch.io): `npm install -g brunch`
     * [Bower](http://bower.io): `npm install -g bower`
     * Brunch plugins and Bower dependencies: `npm install & bower install`.
