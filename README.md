@@ -8,7 +8,7 @@ This is HTML5 application, built with
 Clone this repo manually with git or use `brunch new gh:paulmillr/brunch-with-chaplin`.
 
 ## Getting started
-* Install if you don't have them:
+* Install (if you don't have them):
     * [Node.js](http://nodejs.org): `brew install node` on OS X
     * [Brunch](http://brunch.io): `npm install -g brunch`
     * [Bower](http://bower.io): `npm install -g bower`
@@ -17,8 +17,8 @@ Clone this repo manually with git or use `brunch new gh:paulmillr/brunch-with-ch
     * `brunch watch --server` — watches the project with continuous rebuild. This will also launch HTTP server with [pushState](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
     * `brunch build --production` — builds minified project for production
 * Learn:
-    * `public/` dir is fully auto-generated and served by HTTP server.You should write your code in `app` dir.
-    * Place static stuff you want to be copied to `public` in `app/assets`.
+    * `public/` dir is fully auto-generated and served by HTTP server.  Write your code in `app` dir.
+    * Place static files you want to be copied from `app/assets` to `public`.
     * [Brunch site](http://brunch.io), [Chaplin site](http://chaplinjs.org)
 
 ---------------
