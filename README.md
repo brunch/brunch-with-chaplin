@@ -1,5 +1,5 @@
 # Brunch with Chaplin
-![](https://a248.e.akamai.net/camo.github.com/b7ebb8bbcec7938940cf8e9c441124c3bddafd3a/687474703a2f2f662e636c2e6c792f6974656d732f34373039326b30423141334a317a3166306b34362f6277632e706e67)
+![Logo](https://f.cloud.github.com/assets/574696/1364001/0d754508-3836-11e3-91eb-3de28280c2cc.png)
 
 This is HTML5 application, built with
 [Brunch](http://brunch.io) and [Chaplin](http://chaplinjs.org).
