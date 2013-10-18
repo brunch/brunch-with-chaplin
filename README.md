@@ -2,23 +2,24 @@
 ![](https://a248.e.akamai.net/camo.github.com/b7ebb8bbcec7938940cf8e9c441124c3bddafd3a/687474703a2f2f662e636c2e6c792f6974656d732f34373039326b30423141334a317a3166306b34362f6277632e706e67)
 
 This is HTML5 application, built with
-[Brunch](http://brunch.io) and
-[Chaplin](http://chaplinjs.org).
+[Brunch](http://brunch.io) and [Chaplin](http://chaplinjs.org).
 
 ## Installation
-Clone this repo manually with Git or use `brunch new gh:paulmillr/brunch-with-chaplin`.
+Clone this repo manually with git or use `brunch new gh:paulmillr/brunch-with-chaplin`.
 
 ## Getting started
-* Install [Brunch](http://brunch.io): `npm install -g brunch`.
-* Install Brunch plugins and Bower components: `npm install & bower install`.
-* Watch the project with continuous rebuild by
-`brunch watch --server`. This will also launch HTTP server.
-* `public/` dir is fully auto-generated and served by HTTP server.
-* Write your code in `app` dir.
-* Optionally, you can scaffold things, see readme in `generators` directory.
-* For production, build minified project with `brunch build --optimize`.
-
-See [Chaplin site](http://chaplinjs.org) for docs and more info.
+* Install:
+    * [node.js](http://nodejs.org) if you don't have it (`brew install node` on OS X).
+    * [Brunch](http://brunch.io): `npm install -g brunch`
+    * [Bower](http://bower.io): `npm install -g bower`
+    * Brunch plugins and Bower dependencies: `npm install & bower install`.
+* Run:
+    * `brunch watch --server` — will watch the project with continuous rebuild. This will also launch HTTP server.
+    * `brunch build --production` — will build minified project for production
+* Learn:
+    * `public/` dir is fully auto-generated and served by HTTP server.You should write your code in `app` dir.
+    * Place static stuff you want to be copied to `public` in `app/assets`.
+    * [Brunch site](http://brunch.io), [Chaplin site](http://chaplinjs.org)
 
 ---------------
 
