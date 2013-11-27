@@ -1,5 +1,5 @@
 # Brunch with Chaplin
-![bwc-logo]http://brunch.io/images/svg/brunch.svg)
+![bwc-logo](http://brunch.io/images/svg/brunch.svg)
 
 This is HTML5 application, built with
 [Brunch](http://brunch.io) and [Chaplin](http://chaplinjs.org).
