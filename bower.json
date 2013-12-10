@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "main": "public/javascripts/app.js",
   "dependencies": {
-    "chaplin": "~0.11.3",
+    "chaplin": "~0.12.0",
     "console-polyfill": "~0.1.0",
     "lodash": "~2.0.0",
     "jquery": "~2.0.2",

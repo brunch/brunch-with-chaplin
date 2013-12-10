@@ -1,6 +1,7 @@
 # Application-specific view helpers
 # http://handlebarsjs.com/#helpers
 # --------------------------------
+utils = require './utils'
 
 register = (name, fn) ->
   Handlebars.registerHelper name, fn
@@ -24,4 +25,4 @@ register 'without', (context, options) ->
 
 # Get Chaplin-declared named routes. {{url "likes#show" "105"}}
 register 'url', (routeName, params..., options) ->
-  Chaplin.helpers.reverse routeName, params
+  utils.reverse routeName, params
