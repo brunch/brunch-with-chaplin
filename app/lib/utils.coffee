@@ -4,7 +4,7 @@
 # Delegate to Chaplin’s utils module.
 utils = Chaplin.utils.beget Chaplin.utils
 
-# _(utils).extend
+# _.extend utils,
 #  someMethod: ->
 
 # Prevent creating new properties and stuff.

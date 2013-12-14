@@ -4,6 +4,8 @@
 This is HTML5 application, built with
 [Brunch](http://brunch.io) and [Chaplin](http://chaplinjs.org).
 
+* [CoffeeScript version](https://github.com/paulmillr/brunch-with-chaplin) | [JavaScript version](https://github.com/paulmillr/brunch-with-chaplin-js)
+
 ## Installation
 Clone this repo manually with git or use `brunch new gh:paulmillr/brunch-with-chaplin`
 
