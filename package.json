@@ -4,6 +4,7 @@
   "description": "Package description",
   "version": "0.0.1",
   "homepage": "",
+  "private": true,
   "repository": {
     "type": "git",
     "url": ""
