@@ -1,3 +1,4 @@
+Chaplin = require 'chaplin'
 # Base model.
 module.exports = class Model extends Chaplin.Model
   # Mixin a synchronization state machine.
