@@ -14,14 +14,22 @@
     "test": "brunch test"
   },
   "dependencies": {
-    "javascript-brunch": ">= 1.0 < 1.8",
-    "coffee-script-brunch": ">= 1.0 < 1.8",
-    "css-brunch": ">= 1.0 < 1.8",
-    "stylus-brunch": ">= 1.0 < 1.8",
-    "handlebars-brunch": ">= 1.0 < 1.8",
-    "uglify-js-brunch": ">= 1.0 < 1.8",
-    "clean-css-brunch": ">= 1.0 < 1.8",
-    "auto-reload-brunch": ">= 1.0 < 1.8"
+    "chaplin": "~1.1.0",
+    "console-polyfill": "~0.1.0",
+    "lodash": "~2.2.0",
+    "jquery": "~2.2.0",
+    "exoskeleton": "~0.6.0",
+    "normalize.css": "~3.0.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "javascript-brunch": "~2.0.0",
+    "coffee-script-brunch": "~2.0.0",
+    "css-brunch": "~2.0.0",
+    "stylus-brunch": "~2.0.0",
+    "handlebars-brunch": "~2.0.0",
+    "uglify-js-brunch": "~2.0.0",
+    "clean-css-brunch": "~2.0.0",
+    "auto-reload-brunch": "~2.0.0",
+    "brunch": "~2.3.0"
+  }
 }

@@ -11,3 +11,15 @@ exports.config =
 
     templates:
       joinTo: 'javascripts/app.js'
+
+  npm:
+    aliases:
+      backbone: 'exoskeleton'
+
+    globals:
+      _cp: 'console-polyfill'
+      $: 'jquery'
+
+    styles:
+      'normalize.css': ['normalize.css']
+
