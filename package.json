@@ -16,7 +16,7 @@
   "dependencies": {
     "chaplin": "~1.1.0",
     "console-polyfill": "~0.1.0",
-    "lodash": "~2.2.0",
+    "lodash": "~4.17.19",
     "jquery": "~2.2.0",
     "exoskeleton": "~0.6.0",
     "normalize.css": "~3.0.3"
